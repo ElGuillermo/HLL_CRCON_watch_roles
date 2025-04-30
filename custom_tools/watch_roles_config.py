@@ -58,8 +58,8 @@ ADVICE_MESSAGE_TEXT_EN = {
 
 # Set the language for the advice messages texts
 # (Uncomment the desired language)
-ADVICE_MESSAGE_TEXT = ADVICE_MESSAGE_TEXT_FR
-# ADVICE_MESSAGE_TEXT = ADVICE_MESSAGE_TEXT_EN
+# ADVICE_MESSAGE_TEXT = ADVICE_MESSAGE_TEXT_FR
+ADVICE_MESSAGE_TEXT = ADVICE_MESSAGE_TEXT_EN
 
 # Officers roles (DO NOT edit this)
 OFFICERS = {'armycommander', 'officer', 'tankcommander', 'spotter'}
