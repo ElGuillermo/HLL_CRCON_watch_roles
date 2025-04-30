@@ -13,10 +13,29 @@ Feel free to use/modify/distribute, as long as you keep this note in your code
 # Default : 60
 WATCH_INTERVAL = 60
 
-# The texts below are displayed to the player when they take a role.
-# You can modify them to your liking.
-# Check for the next setting to set the language you want to use.
-# French version
+# Players who have reached level X won't receive role guidance
+# Default : 30
+MIN_IMMUNE_LEVEL = 30
+
+# Always warn quitting/shifting officers (whatever their level) ?
+# (they'll always be warned if their level is below MIN_IMMUNE_LEVEL)
+# Default : True
+ALWAYS_WARN_BAD_OFFICERS = True
+
+# Should we suggest players about taking support role ?
+# You can define the number of support roles that need to be taken as is :
+# {1:1, 2:1, 3:2} means "1 squad: 1 support, 2 squads: 1 support, 3 squads: 2 supports"
+REQUIRED_SUPPORTS = {1:1, 2:1, 3:2, 4:2, 5:2, 6:4, 7:4, 8:5, 9:5, 10:6, 11:6}
+
+# Always suggest players about taking support role ?
+# (they'll always be warned if their level is below MIN_IMMUNE_LEVEL)
+# Default : True
+ALWAYS_SUGGEST_SUPPORT = True
+
+# The texts below are displayed to the player.
+# (Check for the next setting to set the language you want to use)
+
+# French
 ADVICE_MESSAGE_TEXT_FR = {
     "armycommander": "Tu as choisi de jouer\n- Commandant -\n----------\nTu DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nDemande aux officiers de poser des garnies\net aux ingénieurs de construire des nodes dès qu'ils le peuvent.",
     "officer": "Tu as choisi de jouer\n- Squad Leader (SL) -\n----------\nTu DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nPose des garnies à 200m des points et ton AP à 100m.\nInforme le commandant de tes actions et exécute ses ordres.",
@@ -27,6 +46,7 @@ ADVICE_MESSAGE_TEXT_FR = {
     "assault": "Tu as choisi de jouer\n- Assaut -\nC'est à toi d'ouvrir le front.\nInforme ton officier des ennemis que tu rencontres.",
     "heavymachinegunner": "Tu as choisi de jouer\n- Mitrailleur lourd -\nPoste-toi en arrière ou en hauteur pour couvrir tes camarades.",
     "support": "Tu as choisi de jouer\n- Soutien -\nAide le SL à avancer et pose ta caisse de supply quand une garnie peut être construite.",
+    "support_needed": "Ton équipe manque de Soutiens !\nEn jouant ce rôle, tu pourrais aider ton SL à poser des garnies !\n----------\n",
     "sniper": "Tu as choisi de jouer\n- Sniper -\nFaufile-toi dans les lignes ennemies,\nélimine les cibles prioritaires\ndétruis les nodes\net informe ton SL de ce que tu vois.",
     "spotter": "Tu as choisi de jouer\n- SL reco -\n----------\nTu DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nFaufile-toi dans les lignes ennemies,\nélimine les cibles prioritaires\ndétruis les nodes\net informe le commandant de ce que tu vois",
     "rifleman": "Tu as choisi de jouer\n- Fusilier -\nC'est un rôle idéal pour débuter,\nchoisis-en un autre quand tu penses pouvoir l'assumer.",
@@ -36,7 +56,7 @@ ADVICE_MESSAGE_TEXT_FR = {
     "medic": "Tu as choisi de jouer\n- Médecin -\nReste en arrière et soigne les blessés.\nAnnonce-toi en vocal de proximité pour éviter qu'ils se redéploient avant ton arrivée."
 }
 
-# English version
+# English
 ADVICE_MESSAGE_TEXT_EN = {
     "armycommander": "You chose to play\n- Commander -\n----------\nYou MUST communicate via voice chat.\nIf you can't or won't: give up your spot!\n----------\nAsk officers to place garrisons and engineers to build nodes as soon as possible.",
     "officer": "You chose to play\n- Squad Leader (SL) -\n----------\nYou MUST communicate via voice chat.\nIf you can't or won't: give up your spot!\n----------\nPlace garrisons 200m from objectives and your OP 100m away.\nInform the commander of your actions and follow orders.",
@@ -47,6 +67,7 @@ ADVICE_MESSAGE_TEXT_EN = {
     "assault": "You chose to play\n- Assault -\nIt's your job to lead the charge.\nInform your officer about enemies you encounter.",
     "heavymachinegunner": "You chose to play\n- Heavy Machine Gunner -\nPosition yourself in the rear or on high ground to cover your teammates.",
     "support": "You chose to play\n- Support -\nHelp the SL move forward and drop your supply crate when a garrison can be built.",
+    "support_needed": "Your team needs more Supports !\nPlaying this role, you would help to build garrisons!\n----------\n",
     "sniper": "You chose to play\n- Sniper -\nSneak into enemy lines,\neliminate priority targets,\ndestroy nodes,\nand report what you see to your SL.",
     "spotter": "You chose to play\n- Recon SL -\n----------\nYou MUST communicate via voice chat.\nIf you can't or won't: give up your spot!\n----------\nSneak into enemy lines,\neliminate priority targets,\ndestroy nodes,\nand report to the commander what you see.",
     "rifleman": "You chose to play\n- Rifleman -\nIt's an ideal role for beginners.\nPick a different one when you feel ready to take on more responsibility.",
@@ -56,13 +77,63 @@ ADVICE_MESSAGE_TEXT_EN = {
     "medic": "You chose to play\n- Medic -\nStay in the rear and heal the wounded.\nAnnounce yourself using proximity voice chat so they don’t redeploy before you arrive."
 }
 
+# Spanish
+ADVICE_MESSAGE_TEXT_ES = {
+    "armycommander": "Has elegido jugar como\n- Comandante -\n----------\nDEBES comunicarte por chat de voz.\nSi no puedes o no quieres: ¡cede tu puesto!\n----------\nPide a los oficiales que coloquen guarniciones y a los ingenieros que construyan nodos lo antes posible.",
+    "officer": "Has elegido jugar como\n- Líder de escuadra (SL) -\n----------\nDEBES comunicarte por chat de voz.\nSi no puedes o no quieres: ¡cede tu puesto!\n----------\nColoca guarniciones a 200m de los objetivos y tu OP a 100m.\nInforma al comandante de tus acciones y sigue órdenes.",
+    "officer_quitter": "Has abandonado tu rol de oficial,\nabandonando a tus hombres.\nEste comportamiento es inaceptable.\nLos administradores han sido alertados.\n----------\n",
+    "officer_shifter": "Has abandonado tu rol de oficial,\nabandonando a tus hombres.\nEste comportamiento es inaceptable.\nLos administradores han sido alertados.\n----------\n",
+    "antitank": "Has elegido jugar como\n- Antitanque -\nRecuerda, el punto débil de los vehículos blindados está en la parte trasera.",
+    "automaticrifleman": "Has elegido jugar como\n- Fusilero automático -\nAsegura el avance de tus compañeros.\nProtege al SL, al apoyo, las guarniciones y los OPs.",
+    "assault": "Has elegido jugar como\n- Asalto -\nTu trabajo es liderar la carga.\nInforma a tu oficial sobre los enemigos que encuentres.",
+    "heavymachinegunner": "Has elegido jugar como\n- Ametrallador pesado -\nColócate en la retaguardia o en un terreno elevado para cubrir a tus compañeros.",
+    "support": "Has elegido jugar como\n- Apoyo -\nAyuda al SL a avanzar y suelta tu caja de suministros cuando se pueda construir una guarnición.",
+    "support_needed": "¡Tu equipo necesita más apoyos!\nJugando este rol ayudarías a construir guarniciones.\n----------\n",
+    "sniper": "Has elegido jugar como\n- Francotirador -\nInfiltrate en las líneas enemigas,\nelimina objetivos prioritarios,\ndestruye nodos,\ne informa a tu SL de lo que veas.",
+    "spotter": "Has elegido jugar como\n- Líder de reconocimiento -\n----------\nDEBES comunicarte por chat de voz.\nSi no puedes o no quieres: ¡cede tu puesto!\n----------\nInfiltrate en las líneas enemigas,\nelimina objetivos prioritarios,\ndestruye nodos,\ne informa al comandante de lo que veas.",
+    "rifleman": "Has elegido jugar como\n- Fusilero -\nEs un rol ideal para principiantes.\nElige otro cuando te sientas listo para asumir más responsabilidades.",
+    "crewman": "Has elegido jugar como\n- Tripulación de tanque -\nUna tripulación es siempre más efectiva cuando se comunica.\nInforma a tu comandante de tanque sobre lo que veas.",
+    "tankcommander": "Has elegido jugar como\n- Comandante de tanque -\n----------\nDEBES comunicarte por chat de voz.\nSi no puedes o no quieres: ¡cede tu puesto!\n----------\nUna tripulación es siempre más efectiva cuando se comunica.\nInforma a tu comandante de lo que veas.",
+    "engineer": "Has elegido jugar como\n- Ingeniero -\nTu misión principal es asegurar que el comandante tenga nodos.\nTambién puedes fortificar puntos y reparar tanques.",
+    "medic": "Has elegido jugar como\n- Médico -\nMantente en la retaguardia y cura a los heridos.\nAnúnciate usando el chat de voz de proximidad para que no reaparezcan antes de que llegues."
+}
+
+# German
+ADVICE_MESSAGE_TEXT_DE = {
+    "armycommander": "Du hast gewählt zu spielen als\n- Kommandant -\n----------\nDU MUSST über Voice-Chat kommunizieren.\nWenn du nicht kannst oder willst: Gib deinen Platz frei!\n----------\nBitte die Offiziere, Garnisonen zu platzieren, und Ingenieure, so schnell wie möglich Versorgungsknoten zu bauen.",
+    "officer": "Du hast gewählt zu spielen als\n- Truppführer (SL) -\n----------\nDU MUSST über Voice-Chat kommunizieren.\nWenn du nicht kannst oder willst: Gib deinen Platz frei!\n----------\nPlatziere Garnisonen 200 m vom Ziel entfernt und dein OP 100 m entfernt.\nInformiere den Kommandanten über deine Aktionen und folge seinen Befehlen.",
+    "officer_quitter": "Du hast deine Offiziersrolle verlassen\nund deine Männer im Stich gelassen.\nDieses Verhalten ist inakzeptabel.\nAdmins wurden benachrichtigt.\n----------\n",
+    "officer_shifter": "Du hast deine Offiziersrolle verlassen\nund deine Männer im Stich gelassen.\nDieses Verhalten ist inakzeptabel.\nAdmins wurden benachrichtigt.\n----------\n",
+    "antitank": "Du hast gewählt zu spielen als\n- Panzerabwehr -\nDenke daran: Die Schwachstelle gepanzerter Fahrzeuge ist das Heck.",
+    "automaticrifleman": "Du hast gewählt zu spielen als\n- MG-Schütze -\nSichere den Vormarsch deiner Kameraden.\nSchütze den SL, die Unterstützer, Garnisonen und OPs.",
+    "assault": "Du hast gewählt zu spielen als\n- Sturmsoldat -\nDeine Aufgabe ist es, den Angriff anzuführen.\nInformiere deinen Offizier über Feinde, denen du begegnest.",
+    "heavymachinegunner": "Du hast gewählt zu spielen als\n- Schwerer MG-Schütze -\nPositioniere dich im Hinterland oder auf erhöhtem Terrain, um deine Kameraden zu decken.",
+    "support": "Du hast gewählt zu spielen als\n- Unterstützer -\nHilf dem SL beim Vorrücken und wirf deine Versorgungskiste ab, wenn eine Garnison gebaut werden kann.",
+    "support_needed": "Dein Team braucht mehr Unterstützer!\nIn dieser Rolle könntest du beim Bau von Garnisonen helfen!\n----------\n",
+    "sniper": "Du hast gewählt zu spielen als\n- Scharfschütze -\nSchleiche dich in feindliche Linien,\nbeseitige vorrangige Ziele,\nzerstöre Knotenpunkte,\nund melde deinem SL, was du siehst.",
+    "spotter": "Du hast gewählt zu spielen als\n- Aufklärungsführer -\n----------\nDU MUSST über Voice-Chat kommunizieren.\nWenn du nicht kannst oder willst: Gib deinen Platz frei!\n----------\nSchleiche dich in feindliche Linien,\nbeseitige vorrangige Ziele,\nzerstöre Knotenpunkte,\nund melde dem Kommandanten, was du siehst.",
+    "rifleman": "Du hast gewählt zu spielen als\n- Schütze -\nDies ist eine ideale Rolle für Anfänger.\nWähle eine andere Rolle, wenn du bereit bist, mehr Verantwortung zu übernehmen.",
+    "crewman": "Du hast gewählt zu spielen als\n- Panzerbesatzung -\nEine Panzerbesatzung ist immer effektiver, wenn sie kommuniziert.\nInformiere deinen Panzerkommandanten über alles, was du siehst.",
+    "tankcommander": "Du hast gewählt zu spielen als\n- Panzerkommandant -\n----------\nDU MUSST über Voice-Chat kommunizieren.\nWenn du nicht kannst oder willst: Gib deinen Platz frei!\n----------\nEine Panzerbesatzung ist immer effektiver, wenn sie kommuniziert.\nInformiere deinen Kommandanten über alles, was du siehst.",
+    "engineer": "Du hast gewählt zu spielen als\n- Ingenieur -\nDeine Hauptaufgabe ist es, dem Kommandanten Versorgungsknoten bereitzustellen.\nDu kannst auch Punkte befestigen und Panzer reparieren.",
+    "medic": "Du hast gewählt zu spielen als\n- Sanitäter -\nBleib im Hinterland und heile Verwundete.\nMelde dich über den Nähe-Voice-Chat, damit sie nicht neu spawnen, bevor du ankommst."
+}
+
+
 # Set the language for the advice messages texts
 # (Uncomment the desired language)
 # ADVICE_MESSAGE_TEXT = ADVICE_MESSAGE_TEXT_FR
 ADVICE_MESSAGE_TEXT = ADVICE_MESSAGE_TEXT_EN
+# ADVICE_MESSAGE_TEXT = ADVICE_MESSAGE_TEXT_ES
+# ADVICE_MESSAGE_TEXT = ADVICE_MESSAGE_TEXT_DE
 
-# Officers roles (DO NOT edit this)
+
+# You shouldn't edit anything below this line
+# -------------------------------------------------------------------------------------------------
+
+# Roles
 OFFICERS = {'armycommander', 'officer', 'tankcommander', 'spotter'}
+SUPPORT_CANDIDATES = {'antitank', 'automaticrifleman', 'assault', 'heavymachinegunner', 'rifleman', 'engineer', 'medic'}
 
-# Bot name that will be reported in logs (no need to edit this)
+# Bot name that will be reported in logs
 BOT_NAME = "CRCON_watch_roles"
