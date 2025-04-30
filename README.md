@@ -1,5 +1,8 @@
 # HLL_CRCON_watch_roles
 A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform players about the role they took.
+- Displays a warning to officers who abandon their squad
+- Can suggest infantry players to take "support" if there isn't enough of them in the team
+- Give general guidance about the current role
 
 ![image](https://github.com/user-attachments/assets/8b19af45-cbf4-4190-bf0f-2b7cae23b0cb) ![image](https://github.com/user-attachments/assets/315a93c6-9064-48df-91b3-af9c55fe181b)
 
