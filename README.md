@@ -25,7 +25,8 @@ A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform pl
   Second part
   ```shell
   cd /root/hll_rcon_tool/custom_tools
-
+  wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_watch_roles/refs/heads/main/custom_tools/watch_roles.py
+  wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_watch_roles/refs/heads/main/custom_tools/watch_roles_config.py
 - Edit `/root/hll_rcon_tool/config/supervisord.conf` to add this bot section : 
   ```conf
   [program:watch_roles]
