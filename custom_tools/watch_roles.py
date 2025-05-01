@@ -23,6 +23,7 @@ def send_message(
     player_role: str,
     player_level: int,
     player_team: str,
+    player_unit_name: str,
     allies_supports_needed: bool = False,
     axis_supports_needed: bool = False,
     note: str = None
@@ -53,7 +54,7 @@ def send_message(
         message += config.ADVICE_MESSAGE_TEXT.get("support_needed")
 
     # Role guidance
-    if player_level < config.MIN_IMMUNE_LEVEL:
+    if player_level < config.MIN_IMMUNE_LEVEL and player_unit_name is not None:
         message += config.ADVICE_MESSAGE_TEXT.get(player_role)
 
     # Send message
@@ -142,7 +143,7 @@ def track_role_changes():
             current_role[player_id] = new_role
 
             logger_infos = (player_name, old_team, old_unit_name, old_role, new_team, new_unit_name, new_role)
-            message_infos = (player_id, player_name, new_role, player_level, new_team, allies_supports_needed, axis_supports_needed)
+            message_infos = (player_id, player_name, new_role, player_level, new_team, new_unit_name, allies_supports_needed, axis_supports_needed)
 
             # The player isn't in a team/squad (anymore)
             if new_unit_name == None:
