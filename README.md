@@ -26,6 +26,7 @@ A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform pl
   wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_restart/refs/heads/main/restart.sh
   mkdir custom_tools
   cd custom_tools
+  wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_custom_common_functions.py/refs/heads/main/common_functions.py
   ```
   Second part
   ```shell
