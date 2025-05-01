@@ -164,7 +164,7 @@ def track_role_changes():
         # Do we need to suggest support roles ?
         allies_supports_required = config.REQUIRED_SUPPORTS.get(allies_infantry_officer_count, 4)   # defaults to 4
         allies_supports_needed = allies_support_count < allies_supports_required  # True/False
-        axis_supports_required = config.REQUIRED_SUPPORTS.get(axis_infantry_officer_count, 6)
+        axis_supports_required = config.REQUIRED_SUPPORTS.get(axis_infantry_officer_count, 4)
         axis_supports_needed = axis_support_count < axis_supports_required
 
         # Reset dicts
