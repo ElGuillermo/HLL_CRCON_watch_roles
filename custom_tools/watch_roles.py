@@ -11,8 +11,11 @@ Feel free to use/modify/distribute, as long as you keep this note in your code
 
 import logging
 import time
+import discord  # Discord feature
 from rcon.rcon import Rcon
 from rcon.settings import SERVER_INFO
+from rcon.utils import get_server_number  # Discord feature
+import custom_tools.common_functions as common_functions  # Discord feature
 import custom_tools.watch_roles_config as config
 
 
@@ -20,10 +23,13 @@ def send_message(
     rcon: Rcon,
     player_id: str,
     player_name: str,
-    player_role: str,
     player_level: int,
-    player_team: str,
-    player_unit_name: str,
+    old_team: str,
+    old_unit_name: str,
+    old_role: str,
+    new_team: str,
+    new_unit_name: str,
+    new_role: str,
     allies_supports_needed: bool = False,
     axis_supports_needed: bool = False,
     note: str = None
@@ -45,17 +51,17 @@ def send_message(
     # Suggest support roles
     if (
         (config.ALWAYS_SUGGEST_SUPPORT or player_level < config.MIN_IMMUNE_LEVEL)
-        and player_role in config.SUPPORT_CANDIDATES
+        and new_role in config.SUPPORT_CANDIDATES
         and (
-            (player_team == "allies" and allies_supports_needed)
-            or (player_team == "axis" and axis_supports_needed)
+            (new_team == "allies" and allies_supports_needed)
+            or (new_team == "axis" and axis_supports_needed)
         )
     ):
         message += config.ADVICE_MESSAGE_TEXT.get("support_needed")
 
     # Role guidance
-    if player_level < config.MIN_IMMUNE_LEVEL and player_unit_name is not None:
-        message += config.ADVICE_MESSAGE_TEXT.get(player_role)
+    if player_level < config.MIN_IMMUNE_LEVEL and new_unit_name is not None:
+        message += config.ADVICE_MESSAGE_TEXT.get(new_role)
 
     # Send message
     if message != "":
@@ -70,12 +76,58 @@ def send_message(
             pass
 
 
+def send_discord_alert(
+    player_id: str,
+    player_name: str,
+    player_level: int,
+    old_team: str,
+    old_unit_name: str,
+    old_role: str,
+    new_team: str,
+    new_unit_name: str,
+    new_role: str,
+    allies_supports_needed: bool = False,
+    axis_supports_needed: bool = False,
+    note: str = None
+):
+    # Check if enabled on this server
+    server_number = int(get_server_number())
+    if not config.SERVER_CONFIG[server_number - 1][1]:
+        return
+
+    discord_webhook = config.SERVER_CONFIG[server_number - 1][0]
+
+    # message
+    embed_desc_txt = (
+        f"Level: {player_level}\n"
+        f"{old_team}/{old_unit_name}/{old_role} ➡️ {new_team}/{new_unit_name}/{new_role}"
+    )
+
+    # Create and send discord embed
+    webhook = discord.SyncWebhook.from_url(discord_webhook)
+    embed = discord.Embed(
+        title=player_name,
+        url=common_functions.get_external_profile_url(player_id, player_name),
+        description=embed_desc_txt,
+        color=0xffffff
+    )
+    embed.set_author(
+        name=config.BOT_NAME,
+        url=common_functions.DISCORD_EMBED_AUTHOR_URL,
+        icon_url=common_functions.DISCORD_EMBED_AUTHOR_ICON_URL
+    )
+    embed.set_thumbnail(url=common_functions.get_avatar_url(player_id))
+
+    common_functions.discord_embed_send(embed, webhook)
+
+
 def track_role_changes():
     """
     Observes the players role changes (infinite loop)
     """
     rcon = Rcon(SERVER_INFO)
 
+    # Make previous dicts global
     global previous_team
     global previous_unit_name
     global previous_role
@@ -114,7 +166,7 @@ def track_role_changes():
                     axis_support_count += 1
 
         # Do we need to suggest support roles ?
-        allies_supports_required = config.REQUIRED_SUPPORTS.get(allies_infantry_officer_count, 6)   # default to 6 if squads > 11
+        allies_supports_required = config.REQUIRED_SUPPORTS.get(allies_infantry_officer_count, 4)   # default to 4
         allies_supports_needed = allies_support_count < allies_supports_required  # True if we need more supports
         axis_supports_required = config.REQUIRED_SUPPORTS.get(axis_infantry_officer_count, 6)
         axis_supports_needed = axis_support_count < axis_supports_required
@@ -142,8 +194,17 @@ def track_role_changes():
             current_unit_name[player_id] = new_unit_name
             current_role[player_id] = new_role
 
-            logger_infos = (player_name, old_team, old_unit_name, old_role, new_team, new_unit_name, new_role)
-            message_infos = (player_id, player_name, new_role, player_level, new_team, new_unit_name, allies_supports_needed, axis_supports_needed)
+            logger_infos = (
+                player_name,
+                old_team, old_unit_name, old_role,
+                new_team, new_unit_name, new_role
+            )
+            message_infos = (
+                player_id, player_name, player_level,
+                old_team, old_unit_name, old_role,
+                new_team, new_unit_name, new_role,
+                allies_supports_needed, axis_supports_needed
+            )
 
             # The player isn't in a team/squad (anymore)
             if new_unit_name == None:
@@ -152,18 +213,19 @@ def track_role_changes():
                 if old_role not in config.OFFICERS:
                     pass
 
-                # He was officer before (in another team/unit)
+                # He was officer before
                 elif old_role in config.OFFICERS:
-                    logger.info("(officer -> unassigned) '%s' - %s/%s/%s --> %s/%s/%s", *logger_infos)
+                    logger.info("🟥 (officer -> unassigned) '%s' - %s/%s/%s ➡️ %s/%s/%s", *logger_infos)
                     send_message(rcon, *message_infos, "officer_quitter")
-                    # TODO Discord alert
+                    if config.USE_DISCORD:
+                        send_discord_alert(*message_infos, "officer_quitter")
 
             # The player took an officer role
             elif new_role in config.OFFICERS:
 
                 # He wasn't officer before
                 if old_role not in config.OFFICERS:
-                    logger.info("(soldier -> officer) '%s' - %s/%s/%s --> %s/%s/%s", *logger_infos)
+                    logger.info("🟩 (soldier -> officer) '%s' - %s/%s/%s ➡️ %s/%s/%s", *logger_infos)
                     send_message(rcon, *message_infos)
 
                 # He was officer before (in another team/unit)
@@ -171,24 +233,27 @@ def track_role_changes():
                     old_role in config.OFFICERS
                     and (old_team != new_team or old_unit_name != new_unit_name)
                 ):
-                    logger.info("(officer -> officer) '%s' - %s/%s/%s --> %s/%s/%s", *logger_infos)
+                    logger.info("🟥 (officer -> officer) '%s' - %s/%s/%s ➡️ %s/%s/%s", *logger_infos)
                     send_message(rcon, *message_infos, "officer_shifter")
-                    # TODO Discord alert
+                    if config.USE_DISCORD:
+                        send_discord_alert(*message_infos, "officer_shifter")
 
             # The player took a non-officer role
             elif new_role not in config.OFFICERS:
 
                 # He wasn't officer before
                 if old_role not in config.OFFICERS:
-                    logger.info("(soldier -> soldier) '%s' - %s/%s/%s --> %s/%s/%s", *logger_infos)
+                    logger.info("(soldier -> soldier) '%s' - %s/%s/%s ➡️ %s/%s/%s", *logger_infos)
                     send_message(rcon, *message_infos)
 
                 # He was officer before
                 elif old_role in config.OFFICERS:
-                    logger.info("(officer -> soldier) '%s' - %s/%s/%s --> %s/%s/%s", *logger_infos)
+                    logger.info("🟥 (officer -> soldier) '%s' - %s/%s/%s ➡️ %s/%s/%s", *logger_infos)
                     send_message(rcon, *message_infos, "officer_quitter")
-                    # TODO Discord alert
+                    if config.USE_DISCORD:
+                        send_discord_alert(*message_infos, "officer_quitter")
 
+        # Update dicts
         previous_team = current_team
         previous_unit_name = current_unit_name
         previous_role = current_role
