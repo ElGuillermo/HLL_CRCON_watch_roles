@@ -10,27 +10,45 @@ Feel free to use/modify/distribute, as long as you keep this note in your code
 """
 
 # The bot will check the players every X seconds
-# Default : 60
-WATCH_INTERVAL = 60
+# Default : 30
+WATCH_INTERVAL = 30
 
 # Players who have reached level X won't receive role guidance
 # Default : 30
 MIN_IMMUNE_LEVEL = 30
 
-# Always warn quitting/shifting officers (whatever their level) ?
+# Always warn quitting/shifting officers (whatever their level)
 # (they'll always be warned if their level is below MIN_IMMUNE_LEVEL)
 # Default : True
 ALWAYS_WARN_BAD_OFFICERS = True
 
 # Should we suggest players about taking support role ?
-# You can define the number of support roles that need to be taken as is :
-# {1:1, 2:1, 3:2} means "1 squad: 1 support, 2 squads: 1 support, 3 squads: 2 supports"
-REQUIRED_SUPPORTS = {1:1, 2:1, 3:2, 4:2, 5:2, 6:4, 7:4, 8:5, 9:5, 10:6, 11:6}
+# Define the number of supports that need to be taken as is :
+# {1:1, 2:1, 3:2} means "1 infantry squad: 1 support, 2 infantry squads: 1 support, 3 infantry squads: 2 supports"
+REQUIRED_SUPPORTS = {1:1, 2:1, 3:2, 4:2, 5:3, 6:3, 7:4, 8:4, 9:5, 10:5, 11:6, 12:6}
 
-# Always suggest players about taking support role ?
-# (they'll always be warned if their level is below MIN_IMMUNE_LEVEL)
+# Always suggest players about taking support role (whatever their level)
+# (they'll always be informed if their level is below MIN_IMMUNE_LEVEL)
 # Default : True
 ALWAYS_SUGGEST_SUPPORT = True
+
+# Use Discord (the script can work without any Discord output)
+USE_DISCORD = False
+
+# Dedicated Discord's channel webhook
+SERVER_CONFIG = [
+    ["https://discord.com/api/webhooks/...", False],  # Server 1
+    ["https://discord.com/api/webhooks/...", False],  # Server 2
+    ["https://discord.com/api/webhooks/...", False],  # Server 3
+    ["https://discord.com/api/webhooks/...", False],  # Server 4
+    ["https://discord.com/api/webhooks/...", False],  # Server 5
+    ["https://discord.com/api/webhooks/...", False],  # Server 6
+    ["https://discord.com/api/webhooks/...", False],  # Server 7
+    ["https://discord.com/api/webhooks/...", False],  # Server 8
+    ["https://discord.com/api/webhooks/...", False],  # Server 9
+    ["https://discord.com/api/webhooks/...", False]  # Server 10
+]
+
 
 # The texts below are displayed to the player.
 # (Check for the next setting to set the language you want to use)
