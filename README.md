@@ -54,6 +54,7 @@ A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform pl
 
 ## Limitations
 ⚠️ Any change to these files requires a CRCON rebuild and restart (using the `restart.sh` script) to be taken in account :
+- `/root/hll_rcon_tool/custom_tools/common_functions.py`
 - `/root/hll_rcon_tool/custom_tools/watch_roles.py`
 - `/root/hll_rcon_tool/custom_tools/watch_roles_config.py`
 
