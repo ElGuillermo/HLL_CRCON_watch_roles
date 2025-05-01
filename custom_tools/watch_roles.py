@@ -142,9 +142,7 @@ def track_role_changes():
             time.sleep(config.WATCH_INTERVAL)
             continue
 
-        # Count players in each team (total players/officers/supports)
-        # axis_count = 0
-        # allies_count = 0
+        # Count players in each team (infantry officers/supports)
         allies_infantry_officer_count = 0
         allies_support_count = 0
         axis_infantry_officer_count = 0
@@ -152,26 +150,24 @@ def track_role_changes():
         for player in detailed_players["players"].values():
 
             if player.get('team') == "allies":
-                # allies_count += 1
                 if player.get('role') == "officer":
                     allies_infantry_officer_count += 1
                 if player.get('role') == "support":
                     allies_support_count += 1
 
             elif player.get('team') == "axis":
-                # axis_count += 1
                 if player.get('role') == "officer":
                     axis_infantry_officer_count += 1
                 if player.get('role') == "support":
                     axis_support_count += 1
 
         # Do we need to suggest support roles ?
-        allies_supports_required = config.REQUIRED_SUPPORTS.get(allies_infantry_officer_count, 4)   # default to 4
-        allies_supports_needed = allies_support_count < allies_supports_required  # True if we need more supports
+        allies_supports_required = config.REQUIRED_SUPPORTS.get(allies_infantry_officer_count, 4)   # defaults to 4
+        allies_supports_needed = allies_support_count < allies_supports_required  # True/False
         axis_supports_required = config.REQUIRED_SUPPORTS.get(axis_infantry_officer_count, 6)
         axis_supports_needed = axis_support_count < axis_supports_required
 
-        # Initialize/reset dicts
+        # Reset dicts
         current_team = {}
         current_unit_name = {}
         current_role = {}
@@ -182,14 +178,17 @@ def track_role_changes():
             player_name = player.get('name')
             player_level = player.get('level')
 
+            # Get values from previous dicts
             old_team = previous_team.get(player_id)
             old_unit_name = previous_unit_name.get(player_id)
             old_role = previous_role.get(player_id)
 
+            # Get new values
             new_team = player.get('team')
             new_unit_name = player.get('unit_name')
             new_role = player.get('role')
 
+            # Populate dicts
             current_team[player_id] = new_team
             current_unit_name[player_id] = new_unit_name
             current_role[player_id] = new_role
@@ -253,7 +252,7 @@ def track_role_changes():
                     if config.USE_DISCORD:
                         send_discord_alert(*message_infos, "officer_quitter")
 
-        # Update dicts
+        # Update previous dicts
         previous_team = current_team
         previous_unit_name = current_unit_name
         previous_role = current_role
@@ -271,7 +270,7 @@ logger.info(
     config.BOT_NAME
 )
 
-# Initialize dicts
+# Initialize previous dicts
 previous_team = {}
 previous_unit_name = {}
 previous_role = {}
