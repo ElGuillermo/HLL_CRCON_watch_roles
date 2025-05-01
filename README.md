@@ -6,7 +6,7 @@ A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform pl
 - You can set a minimum immune level : experienced players won't get any message
 - Available in 🇫🇷 French, 🇬🇧 English, 🇪🇸 Spanish and 🇩🇪 German
 
-![image](https://github.com/user-attachments/assets/8b19af45-cbf4-4190-bf0f-2b7cae23b0cb) ![image](https://github.com/user-attachments/assets/315a93c6-9064-48df-91b3-af9c55fe181b)
+![image](https://github.com/user-attachments/assets/c7f659c9-a4c8-4b3a-b3b6-a474e18563cb) ![image](https://github.com/user-attachments/assets/6324c5da-4192-4ba4-94d4-0e1649a06f77) ![image](https://github.com/user-attachments/assets/ac838b94-7821-4a7e-aa09-296c6054bf5a) ![image](https://github.com/user-attachments/assets/ca79aaf9-c4b6-449d-ba56-e4c62352a4fa) ![image](https://github.com/user-attachments/assets/b14ca4a7-5f5e-4993-84ce-54b2e822cb1a)
 
 ## Install
 
