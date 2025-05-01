@@ -4,7 +4,8 @@ A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform pl
 - Display a warning to officers who abandon their squad
 - Suggest infantry players to take "support" if there isn't enough of them in the team
 - You can set a minimum immune level : experienced players won't get any message
-- Available in 🇫🇷 French, 🇬🇧 English, 🇪🇸 Spanish and 🇩🇪 German
+- You can send reports about quitting officers in a Discord channel
+- Available in :flag_fr: French, :flag_gb: English, :flag_es: Spanish and :flag_de: German
 
 ![image](https://github.com/user-attachments/assets/c7f659c9-a4c8-4b3a-b3b6-a474e18563cb) ![image](https://github.com/user-attachments/assets/6324c5da-4192-4ba4-94d4-0e1649a06f77) ![image](https://github.com/user-attachments/assets/ac838b94-7821-4a7e-aa09-296c6054bf5a) ![image](https://github.com/user-attachments/assets/ca79aaf9-c4b6-449d-ba56-e4c62352a4fa) ![image](https://github.com/user-attachments/assets/b14ca4a7-5f5e-4993-84ce-54b2e822cb1a)
 
