@@ -25,17 +25,17 @@ ALWAYS_WARN_BAD_OFFICERS = True
 # Should we suggest players about taking support role ?
 # Define the number of supports that need to be taken as is :
 # {1:1, 2:1, 3:2} means "1 infantry squad: 1 support, 2 infantry squads: 1 support, 3 infantry squads: 2 supports"
-REQUIRED_SUPPORTS = {1:1, 2:1, 3:2, 4:2, 5:3, 6:3, 7:4, 8:4, 9:5, 10:5, 11:6, 12:6}
+REQUIRED_SUPPORTS = {0:0, 1:1, 2:1, 3:2, 4:2, 5:3, 6:3, 7:4, 8:4, 9:5, 10:5, 11:6, 12:6}
 
 # Always suggest players about taking support role (whatever their level)
 # (they'll always be informed if their level is below MIN_IMMUNE_LEVEL)
 # Default : True
 ALWAYS_SUGGEST_SUPPORT = True
 
-# Use Discord (the script can work without any Discord output)
-USE_DISCORD = False
-
 # Dedicated Discord's channel webhook
+# (the script can work without any Discord output)
+# ["https://discord.com/api/webhooks/...", True] = enabled
+# ["https://discord.com/api/webhooks/...", False] = disabled
 SERVER_CONFIG = [
     ["https://discord.com/api/webhooks/...", False],  # Server 1
     ["https://discord.com/api/webhooks/...", False],  # Server 2
@@ -58,6 +58,7 @@ ADVICE_MESSAGE_TEXT_FR = {
     "armycommander": "Tu as choisi de jouer\n- Commandant -\n----------\nTu DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nDemande aux officiers de poser des garnies\net aux ingénieurs de construire des nodes dès qu'ils le peuvent.",
     "officer": "Tu as choisi de jouer\n- Squad Leader (SL) -\n----------\nTu DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nPose des garnies à 200m des points et ton AP à 100m.\nInforme le commandant de tes actions et exécute ses ordres.",
     "officer_quitter": "Tu as quitté ton poste d'officier,\nabandonnant tes hommes.\nCe comportement n'est pas acceptable.\nLes admins ont été alertés.\n----------\n",
+    "nb_squads_abandoned": "Nombre de squads abandonnées",
     "antitank": "Tu as choisi de jouer\n- Antitank -\nRappelle-toi que le point faible des blindés est à l'arrière.",
     "automaticrifleman": "Tu as choisi de jouer\nfusilier auto -\nSécurise l'avancée de tes camarades\nProtège le SL, le soutien, les garnies et les APs.",
     "assault": "Tu as choisi de jouer\n- Assaut -\nC'est à toi d'ouvrir le front.\nInforme ton officier des ennemis que tu rencontres.",
@@ -78,6 +79,7 @@ ADVICE_MESSAGE_TEXT_EN = {
     "armycommander": "You chose to play\n- Commander -\n----------\nYou MUST communicate via voice chat.\nIf you can't or won't: give up your spot!\n----------\nAsk officers to place garrisons and engineers to build nodes as soon as possible.",
     "officer": "You chose to play\n- Squad Leader (SL) -\n----------\nYou MUST communicate via voice chat.\nIf you can't or won't: give up your spot!\n----------\nPlace garrisons 200m from objectives and your OP 100m away.\nInform the commander of your actions and follow orders.",
     "officer_quitter": "You have left your officer role,\nabandoning your men.\nThis behavior is unacceptable.\nAdmins have been alerted.\n----------\n",
+    "nb_squads_abandoned": "Number of abandoned squads",
     "antitank": "You chose to play\n- Anti-tank -\nRemember, the weak spot of armored vehicles is at the rear.",
     "automaticrifleman": "You chose to play\n- Automatic Rifleman -\nSecure your comrades' advance.\nProtect the SL, the support, garrisons, and OPs.",
     "assault": "You chose to play\n- Assault -\nIt's your job to lead the charge.\nInform your officer about enemies you encounter.",
@@ -98,6 +100,7 @@ ADVICE_MESSAGE_TEXT_ES = {
     "armycommander": "Has elegido jugar como\n- Comandante -\n----------\nDEBES comunicarte por chat de voz.\nSi no puedes o no quieres: ¡cede tu puesto!\n----------\nPide a los oficiales que coloquen guarniciones y a los ingenieros que construyan nodos lo antes posible.",
     "officer": "Has elegido jugar como\n- Líder de escuadra (SL) -\n----------\nDEBES comunicarte por chat de voz.\nSi no puedes o no quieres: ¡cede tu puesto!\n----------\nColoca guarniciones a 200m de los objetivos y tu OP a 100m.\nInforma al comandante de tus acciones y sigue órdenes.",
     "officer_quitter": "Has abandonado tu rol de oficial,\nabandonando a tus hombres.\nEste comportamiento es inaceptable.\nLos administradores han sido alertados.\n----------\n",
+    "nb_squads_abandoned": "Número de escuadras abandonadas",
     "antitank": "Has elegido jugar como\n- Antitanque -\nRecuerda, el punto débil de los vehículos blindados está en la parte trasera.",
     "automaticrifleman": "Has elegido jugar como\n- Fusilero automático -\nAsegura el avance de tus compañeros.\nProtege al SL, al apoyo, las guarniciones y los OPs.",
     "assault": "Has elegido jugar como\n- Asalto -\nTu trabajo es liderar la carga.\nInforma a tu oficial sobre los enemigos que encuentres.",
@@ -118,6 +121,7 @@ ADVICE_MESSAGE_TEXT_DE = {
     "armycommander": "Du hast gewählt zu spielen als\n- Kommandant -\n----------\nDU MUSST über Voice-Chat kommunizieren.\nWenn du nicht kannst oder willst: Gib deinen Platz frei!\n----------\nBitte die Offiziere, Garnisonen zu platzieren, und Ingenieure, so schnell wie möglich Versorgungsknoten zu bauen.",
     "officer": "Du hast gewählt zu spielen als\n- Truppführer (SL) -\n----------\nDU MUSST über Voice-Chat kommunizieren.\nWenn du nicht kannst oder willst: Gib deinen Platz frei!\n----------\nPlatziere Garnisonen 200 m vom Ziel entfernt und dein OP 100 m entfernt.\nInformiere den Kommandanten über deine Aktionen und folge seinen Befehlen.",
     "officer_quitter": "Du hast deine Offiziersrolle verlassen\nund deine Männer im Stich gelassen.\nDieses Verhalten ist inakzeptabel.\nAdmins wurden benachrichtigt.\n----------\n",
+    "nb_squads_abandoned": "Anzahl der verlassenen Trupps",
     "antitank": "Du hast gewählt zu spielen als\n- Panzerabwehr -\nDenke daran: Die Schwachstelle gepanzerter Fahrzeuge ist das Heck.",
     "automaticrifleman": "Du hast gewählt zu spielen als\n- MG-Schütze -\nSichere den Vormarsch deiner Kameraden.\nSchütze den SL, die Unterstützer, Garnisonen und OPs.",
     "assault": "Du hast gewählt zu spielen als\n- Sturmsoldat -\nDeine Aufgabe ist es, den Angriff anzuführen.\nInformiere deinen Offizier über Feinde, denen du begegnest.",
@@ -151,3 +155,8 @@ SUPPORT_CANDIDATES = {'antitank', 'automaticrifleman', 'assault', 'heavymachineg
 
 # Bot name that will be reported in logs
 BOT_NAME = "CRCON_watch_roles"
+
+# Autocleaning
+# delete departed players from the list after X minutes
+# Default : 180 (3 hours, as an Offensive can last 5x30 + overtime)
+AUTO_CLEANING_TIME = 180
