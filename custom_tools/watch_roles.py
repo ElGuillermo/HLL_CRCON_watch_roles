@@ -1,17 +1,20 @@
 """
 watch_roles.py
 
-A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool)
-that inform players about the role they took.
+A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that tracks role changes,
+warns players (especially bad officers), suggests support roles when needed,
+and optionally sends Discord alerts.
 
-Source : https://github.com/ElGuillermo
-
-Feel free to use/modify/distribute, as long as you keep this note in your code
+Author: https://github.com/ElGuillermo
+License: MIT-like (free use/modify/distribute with attribution)
 """
 
 from datetime import datetime, timedelta
 import logging
 import time
+import signal
+import sys
+from dataclasses import dataclass
 import discord  # Discord feature
 from rcon.rcon import Rcon
 from rcon.settings import SERVER_INFO
@@ -20,195 +23,110 @@ import custom_tools.common_functions as common_functions  # Discord feature
 import custom_tools.watch_roles_config as config
 
 
-def is_support_needed(
-    detailed_players: dict,
-) -> tuple:
+@dataclass
+class PlayerEvent:
     """
-    Do we need to suggest support roles in allies and/or axis ?
-    Returns a tuple (allies_supports_needed: bool, axis_supports_needed: bool)
+    Data class to hold player event information.
     """
-    # Count players in each team (infantry officers/supports)
-    allies_infantry_officer_count = 0
-    allies_support_count = 0
-    axis_infantry_officer_count = 0
-    axis_support_count = 0
+    player_id: str
+    player_name: str
+    actual_level: int
+    previous_team: str
+    previous_unit_name: str
+    previous_role: str
+    actual_team: str
+    actual_unit_name: str
+    actual_role: str
+    nb_abandons: int
+    last_abandon: datetime | None
+    allies_supports_needed: bool
+    axis_supports_needed: bool
 
+
+def is_support_needed(detailed_players: dict) -> tuple[bool, bool]:
+    """
+    Check if support roles are needed based on the number of officers and supports in each team.
+    Returns a tuple indicating if allies and axis need supports.
+    """
+    counts = {"allies": {"officer": 0, "support": 0}, "axis": {"officer": 0, "support": 0}}
     for player in detailed_players["players"].values():
+        team, role = player.get('team'), player.get('role')
+        if team in counts and role in counts[team]:
+            counts[team][role] += 1
 
-        if player.get('team') == "allies":
-            if player.get('role') == "officer":
-                allies_infantry_officer_count += 1
-            if player.get('role') == "support":
-                allies_support_count += 1
-
-        elif player.get('team') == "axis":
-            if player.get('role') == "officer":
-                axis_infantry_officer_count += 1
-            if player.get('role') == "support":
-                axis_support_count += 1
-
-    # Compare required and current supports
-    allies_supports_required = config.REQUIRED_SUPPORTS.get(allies_infantry_officer_count, 0)
-    allies_supports_needed = allies_support_count < allies_supports_required
-    axis_supports_required = config.REQUIRED_SUPPORTS.get(axis_infantry_officer_count, 0)
-    axis_supports_needed = axis_support_count < axis_supports_required
-
-    return allies_supports_needed, axis_supports_needed
+    allies_needed = counts["allies"]["support"] < config.REQUIRED_SUPPORTS.get(counts["allies"]["officer"], 0)
+    axis_needed = counts["axis"]["support"] < config.REQUIRED_SUPPORTS.get(counts["axis"]["officer"], 0)
+    return allies_needed, axis_needed
 
 
-def clean_old_entries(
-    previous_player_data: dict,
-    clean_delay:int = config.AUTO_CLEANING_TIME
-) -> dict:
+def clean_old_entries(previous_data: dict, delay: int = config.AUTO_CLEANING_TIME) -> dict:
     """
-    Clean old entries (gone players)
-    Returns the cleaned previous_player_data dict
+    Remove entries from previous_data that haven't changed in the last 'delay' minutes.
     """
-    # Every entry older than this datetime will get deleted
-    clean_limit = datetime.now() - timedelta(minutes=clean_delay)
-    to_delete = []
+    limit = datetime.now() - timedelta(minutes=delay)
+    to_delete = [pid for pid, pdata in previous_data.items() if pdata['last_role_change'] < limit]
+    for pid in to_delete:
+        pdata = previous_data[pid]
+        logger.info("\u267b\ufe0f '%s' (%s) - not watched anymore", pdata.get('name', '(unknown)'), pdata.get('level', '(unknown)'))
+        previous_data.pop(pid)
+    return previous_data
 
-    for player_id, player_data in previous_player_data.items():
-        last_role_change = player_data.get('last_role_change', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
+def is_recent_abandon(last_abandon: datetime | None) -> bool:
+    """
+    Check if the last abandon was within the configured watch interval.
+    """
+    return bool(last_abandon and (datetime.now() - last_abandon < timedelta(seconds=config.WATCH_INTERVAL)))
+
+
+def send_message(rcon: Rcon, event: PlayerEvent) -> None:
+    """
+    Send a message to the player based on their role and status.
+    """
+    msg = ""
+    if is_recent_abandon(event.last_abandon) and (config.ALWAYS_WARN_BAD_OFFICERS or event.actual_level < config.MIN_IMMUNE_LEVEL):
+        msg += config.ADVICE_MESSAGE_TEXT.get("officer_quitter")
+        msg += f"{config.ADVICE_MESSAGE_TEXT.get('nb_squads_abandoned')} : {event.nb_abandons}"
+
+    if ((event.actual_team == "allies" and event.allies_supports_needed) or (event.actual_team == "axis" and event.axis_supports_needed)) \
+        and event.actual_role in config.SUPPORT_CANDIDATES and (config.ALWAYS_SUGGEST_SUPPORT or event.actual_level < config.MIN_IMMUNE_LEVEL):
+        msg += config.ADVICE_MESSAGE_TEXT.get("support_needed")
+
+    if event.actual_level < config.MIN_IMMUNE_LEVEL and event.actual_unit_name:
+        msg += config.ADVICE_MESSAGE_TEXT.get(event.actual_role, '')
+
+    if msg:
         try:
-            last_role_change_datetime = datetime.strptime(last_role_change, '%Y-%m-%d %H:%M:%S')
-        except ValueError:
-            continue
-
-        if last_role_change_datetime < clean_limit:
-            logger.info(
-                "♻️ '%s' (%s) - not watched anymore",
-                player_data.get('name', "(unknown)"),
-                player_data.get('level', "(unknown)"),
-            )
-            to_delete.append(player_id)
-
-    for player_id in to_delete:
-        previous_player_data.pop(player_id, None)
-
-    return previous_player_data
+            rcon.message_player(player_id=event.player_id, message=msg, by=config.BOT_NAME)
+        except Exception as e:
+            logger.error("!!! Error while sending message to '%s' : %s", event.player_name, str(e))
 
 
-def send_message(
-    rcon: Rcon,
-    message_data: tuple
-):
+def send_discord_alert(event: PlayerEvent) -> None:
     """
-    Sends a message to the player to remind them of their responsibilities
-    as an officer or to give them advice on their role.
+    Send a Discord alert for the player event.
     """
-    (
-        player_id,
-        player_name,
-        actual_level,
-        _,
-        _,
-        _,
-        actual_team,
-        actual_unit_name,
-        actual_role,
-        nb_abandons,
-        last_abandon,
-        allies_supports_needed,
-        axis_supports_needed
-    ) = message_data
-
-    message = ""
-
-    # Define if the player has abandoned its squad/team since the latest loop
-    last_abandon_dt = datetime.strptime(last_abandon, '%Y-%m-%d %H:%M:%S')
-    abandon_delay = datetime.now() - last_abandon_dt
-    if (
-        abandon_delay < timedelta(seconds=config.WATCH_INTERVAL)
-        and (
-            config.ALWAYS_WARN_BAD_OFFICERS
-            or actual_level < config.MIN_IMMUNE_LEVEL
-        )
-    ):
-        message += config.ADVICE_MESSAGE_TEXT.get("officer_quitter")
-        message += f"{config.ADVICE_MESSAGE_TEXT.get("nb_squads_abandoned")} : {nb_abandons}"
-
-    # Suggest support roles
-    if (
-        (
-            (actual_team == "allies" and allies_supports_needed)
-            or (actual_team == "axis" and axis_supports_needed)
-        )
-        and actual_role in config.SUPPORT_CANDIDATES
-        and (
-            config.ALWAYS_SUGGEST_SUPPORT
-            or actual_level < config.MIN_IMMUNE_LEVEL
-        )
-    ):
-        message += config.ADVICE_MESSAGE_TEXT.get("support_needed")
-
-    # Role guidance
-    if actual_level < config.MIN_IMMUNE_LEVEL and actual_unit_name is not None:
-        message += config.ADVICE_MESSAGE_TEXT.get(actual_role)
-
-    # Send message
-    if message != "":
-        try:
-            rcon.message_player(
-                player_id=player_id,
-                message=message,
-                by=config.BOT_NAME
-            )
-        except Exception as error:
-            logger.error("!!! Error while sending message to '%s' : %s", player_name, str(error))
-
-
-def send_discord_alert(
-    message_data: tuple
-):
-    """
-    Sends a discord alert to the server admins
-    """
-    (
-        player_id,
-        player_name,
-        actual_level,
-        previous_team,
-        previous_unit_name,
-        previous_role,
-        actual_team,
-        actual_unit_name,
-        actual_role,
-        nb_abandons,
-        last_abandon,
-        _,
-        _
-    ) = message_data
-
-    # Check if enabled on this server
     server_number = int(get_server_number())
-    if not config.SERVER_CONFIG[server_number - 1][1]:
+    try:
+        webhook_url, alerts_enabled = config.SERVER_CONFIG[server_number - 1]
+    except IndexError:
+        logger.error("No config found for server %s", server_number)
         return
 
-    # Define if the player has abandoned its squad/team since the latest loop
-    last_abandon_dt = datetime.strptime(last_abandon, '%Y-%m-%d %H:%M:%S')
-    abandon_delay = datetime.now() - last_abandon_dt
-    if not (
-        abandon_delay < timedelta(seconds=config.WATCH_INTERVAL)
-    ):
+    if not alerts_enabled or not is_recent_abandon(event.last_abandon):
         return
 
-    discord_webhook = config.SERVER_CONFIG[server_number - 1][0]
-
-    # message
-    embed_desc_txt = (
-        f"{config.ADVICE_MESSAGE_TEXT.get("nb_squads_abandoned")} : {nb_abandons}\n"
-        f"Level : {actual_level}\n"
-        f"{previous_team}/{previous_unit_name}/{previous_role} ➡️ {actual_team}/{actual_unit_name}/{actual_role}"
+    embed_desc = (
+        f"{config.ADVICE_MESSAGE_TEXT.get('nb_squads_abandoned', 'Abandons')} : {event.nb_abandons}\n"
+        f"Level : {event.actual_level}\n"
+        f"{event.previous_team}/{event.previous_unit_name}/{event.previous_role} ➡️ {event.actual_team}/{event.actual_unit_name}/{event.actual_role}"
     )
 
-    # Create and send discord embed
-    webhook = discord.SyncWebhook.from_url(discord_webhook)
+    webhook = discord.SyncWebhook.from_url(webhook_url)
     embed = discord.Embed(
-        title=player_name,
-        url=common_functions.get_external_profile_url(player_id, player_name),
-        description=embed_desc_txt,
+        title=event.player_name,
+        url=common_functions.get_external_profile_url(event.player_id, event.player_name),
+        description=embed_desc,
         color=0xffffff
     )
     embed.set_author(
@@ -216,136 +134,155 @@ def send_discord_alert(
         url=common_functions.DISCORD_EMBED_AUTHOR_URL,
         icon_url=common_functions.DISCORD_EMBED_AUTHOR_ICON_URL
     )
-    embed.set_thumbnail(url=common_functions.get_avatar_url(player_id))
+    embed.set_thumbnail(url=common_functions.get_avatar_url(event.player_id))
 
     common_functions.discord_embed_send(embed, webhook)
 
 
 def track_role_changes():
     """
-    Observes the players role changes (infinite loop)
+    Main function to track role changes and send alerts.
     """
     rcon = Rcon(SERVER_INFO)
-    previous_player_data = {}
+    prev_data = {}
 
-    while True:  # infinite loop
+    while True:
+        now = datetime.now()
 
-        # Get players infos
         try:
-            detailed_players = rcon.get_detailed_players()
-        except Exception as error:
-            logger.error("get_detailed_players() failed : %s", str(error))
+            players = rcon.get_detailed_players()
+        except Exception as e:
+            logger.error("get_detailed_players() failed: %s", str(e))
             time.sleep(config.WATCH_INTERVAL)
             continue
 
-        # Are supports needed ?
-        allies_supports_needed, axis_supports_needed = is_support_needed(detailed_players)
+        allies_needed, axis_needed = is_support_needed(players)
+        prev_data = clean_old_entries(prev_data)
 
-        # Clean old entries
-        previous_player_data = clean_old_entries(previous_player_data)
+        for p in players["players"].values():
+            # Validate required fields
+            required_fields = ['player_id', 'name', 'level', 'team', 'unit_name', 'role']
+            missing = [k for k in required_fields if k not in p]
+            if missing:
+                logger.warning("Skipping player missing fields %s: %s", missing, p.get('name', 'Unknown'))
+                continue
 
-        for player in detailed_players["players"].values():
-            player_id = player.get('player_id')
-            player_name = player.get('name')
-            actual_level = player.get('level')
-            actual_team = player.get('team')
-            actual_unit_name = player.get('unit_name')
-            actual_role = player.get('role')
+            pid, name, level = p['player_id'], p['name'], p['level']
+            team, unit, role = p['team'], p['unit_name'], p['role']
 
-            # New player
-            if player_id not in previous_player_data:
-                previous_player_data[player_id] = {
-                    'last_role_change': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                    'player_id': player_id,
-                    'name': player_name,
-                    'level': actual_level,
-                    'team': actual_team,
-                    'unit_name': actual_unit_name,
-                    'role': actual_role,
+            if pid not in prev_data:
+                prev_data[pid] = {
+                    'last_role_change': now,
+                    'player_id': pid,
+                    'name': name,
+                    'level': level,
+                    'team': team,
+                    'unit_name': unit,
+                    'role': role,
                     'nb_abandons': 0,
                     'last_abandon': None
                 }
-                logger.info(
-                    "🆕 '%s' (%s) - %s/%s/%s",
-                    player_name, actual_level, actual_team, actual_unit_name, actual_role
-                )
-                continue  # We'll evaluate changes on next loop
+                logger.info("\U0001f195 '%s' (%s) - %s/%s/%s", name, level, team, unit, role)
+                continue
 
-            # The player levelled up
-            previous_level = previous_player_data.get(player_id, {}).get('level', actual_level)
+            old = prev_data[pid]
 
-            if previous_level < actual_level:
-                previous_player_data.setdefault(player_id, {})['level'] = actual_level
-                # logger.info("⬆️ '%s' (level %s ➡️ %s)", player_name, previous_level, actual_level)
+            if old['level'] < level:
+                logger.info("⬆️ '%s' (level %s ➡️ %s)", name, old['level'], level)
+                old['level'] = level
 
-            # The player changed team/unit/role
-            previous_team = previous_player_data.get(player_id, {}).get('team', actual_team)
-            previous_unit_name = previous_player_data.get(player_id, {}).get('unit_name', actual_unit_name)
-            previous_role = previous_player_data.get(player_id, {}).get('role', actual_role)
-            if (
-                previous_team != actual_team
-                or previous_unit_name != actual_unit_name
-                or previous_role != actual_role
-            ):
-                # Update previous_player_data dict
-                last_role_change = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                previous_player_data.setdefault(player_id, {})['last_role_change'] = last_role_change
-                previous_player_data.setdefault(player_id, {})['team'] = actual_team
-                previous_player_data.setdefault(player_id, {})['unit_name'] = actual_unit_name
-                previous_player_data.setdefault(player_id, {})['role'] = actual_role
+            role_changed = old['team'] != team or old['unit_name'] != unit or old['role'] != role
+            if role_changed:
+                # Capture previous values BEFORE updating
+                previous_team = old['team']
+                previous_unit_name = old['unit_name']
+                previous_role = old['role']
+                nb_abandons = old['nb_abandons']
+                abandon = old['last_abandon']
 
-                common_logger_message = f"'{player_name}' ({actual_level}) - {previous_team}/{previous_unit_name}/{previous_role} ➡️ {actual_team}/{actual_unit_name}/{actual_role}"
-
-                nb_abandons = previous_player_data.get(player_id, {}).get('nb_abandons', 0)
-
-                # He (already) was an officer before (so he abandoned his former squad/team)
                 if previous_role in config.OFFICERS:
-                    # Update previous_player_data dict
                     nb_abandons += 1
-                    previous_player_data.setdefault(player_id, {})['nb_abandons'] = nb_abandons
-                    last_abandon = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    previous_player_data.setdefault(player_id, {})['last_abandon'] = last_abandon
-                    # Log
-                    logger.info("🟥x%s " + common_logger_message, nb_abandons)
+                    abandon = now
+                    logger.info(
+                        "🟥x%s '%s' (%s) - %s/%s/%s ➡️ %s/%s/%s",
+                        nb_abandons,
+                        name,
+                        level,
+                        previous_team,
+                        previous_unit_name,
+                        previous_role,
+                        team,
+                        unit,
+                        role
+                    )
+                else:
+                    logger.info(
+                        "🟩 '%s' (%s) - %s/%s/%s ➡️ %s/%s/%s",
+                        name,
+                        level,
+                        previous_team,
+                        previous_unit_name,
+                        previous_role,
+                        team,
+                        unit,
+                        role
+                    )
 
-                # He wasn't officer
-                elif previous_role not in config.OFFICERS:
-                    # Log
-                    logger.info("🟩 " + common_logger_message)
-
-                # Prepare data for messages and Discord alerts
-                message_data = (
-                    player_id,
-                    player_name,
-                    actual_level,
-                    previous_team,
-                    previous_unit_name,
-                    previous_role,
-                    actual_team,
-                    actual_unit_name,
-                    actual_role,
-                    nb_abandons,
-                    previous_player_data.get(player_id, {}).get('last_abandon', None),
-                    allies_supports_needed,
-                    axis_supports_needed
+                event = PlayerEvent(
+                    player_id=pid,
+                    player_name=name,
+                    actual_level=level,
+                    previous_team=previous_team,
+                    previous_unit_name=previous_unit_name,
+                    previous_role=previous_role,
+                    actual_team=team,
+                    actual_unit_name=unit,
+                    actual_role=role,
+                    nb_abandons=nb_abandons,
+                    last_abandon=abandon,
+                    allies_supports_needed=allies_needed,
+                    axis_supports_needed=axis_needed
                 )
 
-                # Send messages and Discord alerts
-                send_message(rcon, message_data)
-                send_discord_alert(message_data)
+                # Update previous data
+                old.update({
+                    'last_role_change': now,
+                    'team': team,
+                    'unit_name': unit,
+                    'role': role,
+                    'nb_abandons': nb_abandons,
+                    'last_abandon': abandon
+                })
 
-        time.sleep(config.WATCH_INTERVAL)
+                send_message(rcon, event)
+                try:
+                    send_discord_alert(event)
+                except Exception as e:
+                    logger.error("Discord alert failed for '%s': %s", name, str(e))
+
+        next_tick = time.time() + config.WATCH_INTERVAL
+        sleep_time = max(0, next_tick - time.time())
+        time.sleep(sleep_time)
 
 
-# Start logger
-logger = logging.getLogger('rcon')
+def shutdown_handler(signum, frame):
+    """
+    Handle shutdown signals (SIGINT, SIGTERM) to gracefully exit the program.
+    """
+    logger.info("Received signal %s: shutting down.", signum)
+    sys.exit(0)
 
-logger.info(
-    "\n-------------------------------------------------------------------------------\n"
-    "%s started\n"
-    "-------------------------------------------------------------------------------",
-    config.BOT_NAME
-)
 
-# Start role tracking (infinite loop)
-track_role_changes()
+# Setup logger
+logger = logging.getLogger(__name__)
+if not logger.hasHandlers():
+    logging.basicConfig(level=logging.INFO)
+
+# Handle graceful shutdown
+signal.signal(signal.SIGINT, shutdown_handler)
+signal.signal(signal.SIGTERM, shutdown_handler)
+
+logger.info("\n-------------------------------------------------------------------------------\n%s started\n-------------------------------------------------------------------------------", config.BOT_NAME)
+
+if __name__ == "__main__":
+    track_role_changes()
