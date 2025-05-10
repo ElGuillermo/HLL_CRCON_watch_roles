@@ -1,9 +1,11 @@
 """
 watch_roles_config.py
 
-A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that tracks role changes,
-warns players (especially bad officers), suggests support roles when needed,
-and optionally sends Discord alerts.
+A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that :
+- inform players about the role they took
+- warns quitting officers
+- suggests support roles when needed
+- (optionally) sends Discord alerts.
 
 Author: https://github.com/ElGuillermo
 License: MIT-like (free use/modify/distribute with attribution)
@@ -153,10 +155,10 @@ ADVICE_MESSAGE_TEXT = ADVICE_MESSAGE_TEXT_EN
 OFFICERS = {'armycommander', 'officer', 'tankcommander', 'spotter'}
 SUPPORT_CANDIDATES = {'antitank', 'automaticrifleman', 'assault', 'heavymachinegunner', 'rifleman', 'engineer', 'medic'}
 
-# Bot name that will be reported in logs
+# Bot name that will be displayed in logs and Discord messages
 BOT_NAME = "CRCON_watch_roles"
 
 # Autocleaning
-# delete departed players from the list after X minutes
-# Default : 180 (3 hours, as an Offensive can last 5x30 + overtime)
-AUTO_CLEANING_TIME = 180
+# Unfollow players who didn't change role since X minutes
+# Default : 90
+AUTO_CLEANING_TIME = 90
