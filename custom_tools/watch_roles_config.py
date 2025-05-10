@@ -1,12 +1,12 @@
 """
 watch_roles_config.py
 
-A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool)
-that inform players about the role they took.
+A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that tracks role changes,
+warns players (especially bad officers), suggests support roles when needed,
+and optionally sends Discord alerts.
 
-Source : https://github.com/ElGuillermo
-
-Feel free to use/modify/distribute, as long as you keep this note in your code
+Author: https://github.com/ElGuillermo
+License: MIT-like (free use/modify/distribute with attribution)
 """
 
 # The bot will check the players every X seconds
