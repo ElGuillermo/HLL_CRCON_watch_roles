@@ -93,43 +93,55 @@ def is_support_needed(
     based on the number of infantry officers and supports in each team.
     Returns a tuple of booleans indicating if allies and/or axis need supports.
     """
-    counts = {"allies": {"officer": 0, "support": 0}, "axis": {"officer": 0, "support": 0}}
+    counts = {
+        "allies": {"officer": 0, "support": 0},
+        "axis": {"officer": 0, "support": 0}
+    }
 
     for realtime_player in realtime_all["players"].values():
-        tested_team, tested_role = realtime_player.get('team'), realtime_player.get('role')
+        tested_team = realtime_player.get('team')
+        tested_role = realtime_player.get('role')
         if tested_team in counts and tested_role in counts[tested_team]:
             counts[tested_team][tested_role] += 1
 
     allies_supports_needed = (
-        counts["allies"]["support"] < config.REQUIRED_SUPPORTS.get(counts["allies"]["officer"], 0)
+        counts["allies"]["support"]
+        < config.REQUIRED_SUPPORTS.get(counts["allies"]["officer"], 0)
     )
     axis_supports_needed = (
-        counts["axis"]["support"] < config.REQUIRED_SUPPORTS.get(counts["axis"]["officer"], 0)
+        counts["axis"]["support"]
+        < config.REQUIRED_SUPPORTS.get(counts["axis"]["officer"], 0)
     )
 
     return allies_supports_needed, axis_supports_needed
 
 
 def is_role_in_squad(
-    player: PlayerData,
+    playerclass: PlayerData,
     realtime_all: dict,
     target_role: str = "support"
 ) -> bool:
     """
-    Check if there is already a player with the given role in the same squad (team + unit).
-    Skips:
-    - The current player
-    - Players not assigned to a unit (unit_name is None)
-    - Players in the 'command' unit
-    - Players with incomplete data
-    Early return if the current player's role is already the target_role.
+    Is there a player with the target_role in player's squad (team + unit) ?
+    Early return if the current player :
+        - isn't assigned to a unit (unit_name is None)
+        - is commander
+        - already plays target_role.
+    Doesn't test :
+        - Players with incomplete data
+        - Current player
+        - Unassigned players
+        - Commanders
     """
     # Player is either unassigned or commander
-    if not player.actual_unit_name or player.actual_unit_name == "command":
+    if (
+        not playerclass.actual_unit_name
+        or playerclass.actual_unit_name == "command"
+    ):
         return False
 
-    # Player already has the role
-    if player.actual_role == target_role:
+    # Player already plays target_role
+    if playerclass.actual_role == target_role:
         return True
 
     for realtime_player in realtime_all.get("players", {}).values():
@@ -143,7 +155,7 @@ def is_role_in_squad(
 
         # Don't test
         if (
-            tested_player_id == player.player_id
+            tested_player_id == playerclass.player_id
             or not tested_unit  # Unassigned
             or tested_unit == "command"  # Commander
         ):
@@ -151,8 +163,8 @@ def is_role_in_squad(
 
         # Someone plays target_role in same team, same squad as player
         if (
-            tested_team == player.actual_team
-            and tested_unit == player.actual_unit_name
+            tested_team == playerclass.actual_team
+            and tested_unit == playerclass.actual_unit_name
             and tested_role == target_role
         ):
             return True
@@ -166,7 +178,7 @@ def clean_old_entries(
     priority_queue: list = []
 ) -> dict:
     """
-    Remove entries from known_all that haven't changed in the last 'delay' minutes.
+    Remove entries that haven't changed in the last 'delay' minutes.
     Uses a priority queue to efficiently track the oldest entries.
     """
     max_age = datetime.now() - timedelta(minutes=delay)
@@ -174,7 +186,11 @@ def clean_old_entries(
     # Add all entries to the priority queue if it's empty
     if not priority_queue:
         for player_id, known_player in known_all.items():
-            heappush(priority_queue, (known_player['lasttime_role_change'], player_id))
+            heappush(
+                priority_queue,
+                (known_player['lasttime_role_change'],
+                player_id)
+            )
 
     # Remove outdated entries
     while priority_queue and priority_queue[0][0] < max_age:
@@ -186,7 +202,10 @@ def clean_old_entries(
                 known_player.get('name', '(unknown)'),
                 known_player.get('level', '(unknown)')
             )
-            logger.debug("known_all dict now contains %s entries", len(known_all))
+            logger.debug(
+                "known_all dict now contains %s entries",
+                len(known_all)
+            )
 
     return known_all
 
@@ -200,13 +219,16 @@ def is_recent_abandon(
     """
     return bool(
         lasttime_abandon
-        and (datetime.now() - lasttime_abandon < timedelta(seconds=watch_interval))
+        and (
+            datetime.now() - lasttime_abandon
+            < timedelta(seconds=watch_interval)
+        )
     )
 
 
 async def send_message_async(
     rcon: Rcon,
-    player: PlayerData,
+    playerclass: PlayerData,
     realtime_all: dict,
     watch_interval: int
 ) -> None:
@@ -217,63 +239,80 @@ async def send_message_async(
 
     # Warn quitting officers
     if (
-        is_recent_abandon(player.lasttime_abandon, watch_interval)
+        is_recent_abandon(playerclass.lasttime_abandon, watch_interval)
         and (
             config.ALWAYS_WARN_BAD_OFFICERS
-            or player.actual_level < config.MIN_IMMUNE_LEVEL
+            or playerclass.actual_level < config.MIN_IMMUNE_LEVEL
         )
     ):
-        msg += config.MESSAGE_TEXT.get("officer_quitter", '(Missing translation)')
-        msg += config.MESSAGE_TEXT.get('nb_squads_abandoned', '(Missing translation)')
-        msg += f" : {player.total_abandons}\n----------\n"
+        msg += config.MESSAGE_TEXT.get(
+            "officer_quitter", '(Missing translation)'
+        )
+        msg += config.MESSAGE_TEXT.get(
+            'nb_squads_abandoned', '(Missing translation)'
+        )
+        msg += f" : {playerclass.total_abandons}\n----------\n"
 
     # Suggest taking support role
     if (
-        player.actual_role in config.SUPPORT_CANDIDATES
+        playerclass.actual_role in config.SUPPORT_CANDIDATES
         and (
-            (player.actual_team == "allies" and player.allies_supports_needed)
-            or (player.actual_team == "axis" and player.axis_supports_needed)
+            (
+                playerclass.actual_team == "allies"
+                and playerclass.allies_supports_needed
+            )
+            or (
+                playerclass.actual_team == "axis"
+                and playerclass.axis_supports_needed
+            )
         )
-        and not is_role_in_squad(player, realtime_all, "support")
+        and not is_role_in_squad(playerclass, realtime_all, "support")
         and (
             config.ALWAYS_SUGGEST_SUPPORT
-            or player.actual_level < config.MIN_IMMUNE_LEVEL
+            or playerclass.actual_level < config.MIN_IMMUNE_LEVEL
         )
     ):
-        msg += config.MESSAGE_TEXT.get("support_needed", '(Missing translation)')
+        msg += config.MESSAGE_TEXT.get(
+            "support_needed", '(Missing translation)'
+        )
 
     # Actual role guidance
     if (
-        player.actual_unit_name
-        and player.actual_level < config.MIN_IMMUNE_LEVEL
+        playerclass.actual_unit_name
+        and playerclass.actual_level < config.MIN_IMMUNE_LEVEL
     ):
-        msg += config.MESSAGE_TEXT.get(player.actual_role, '(Missing translation)')
+        msg += config.MESSAGE_TEXT.get(
+            playerclass.actual_role, '(Missing translation)'
+        )
 
     # Send in-game message
     if msg:
         try:
             await asyncio.to_thread(
                 rcon.message_player,
-                player_id=player.player_id,
+                player_id=playerclass.player_id,
                 message=msg,
                 by=config.BOT_NAME
             )
-        except Exception as e:
+        except Exception as error:
             logger.warning(
                 "⚠️ '%s' (%s) - Couldn't send message : %s",
-                player.name,
-                player.actual_level,
-                str(e)
+                playerclass.name,
+                playerclass.actual_level,
+                str(error)
             )
 
 
 async def send_discord_alert_async(
-    player: PlayerData,
+    playerclass: PlayerData,
     watch_interval: int = 30
 ) -> None:
     """
     Asynchronously send a Discord alert when an officer quits.
     """
+    if not is_recent_abandon(playerclass.lasttime_abandon, watch_interval):
+        return
+
     try:
         server_number = int(get_server_number())
         config_entry = config.SERVER_CONFIG[server_number - 1]
@@ -289,24 +328,30 @@ async def send_discord_alert_async(
         else:
             raise ValueError("Invalid Discord config structure")
 
-    except (IndexError, ValueError, TypeError) as e:
-        logger.error("Invalid Discord config for server %s : %s", server_number, str(e))
+    except (IndexError, ValueError, TypeError) as error:
+        logger.error(
+            "Invalid Discord config for server %s : %s",
+            server_number,
+            str(error)
+        )
         return
 
-    if not alerts_enabled or not is_recent_abandon(player.lasttime_abandon, watch_interval):
+    if not alerts_enabled:
         return
 
     embed_desc = (
-        f"Level : {player.actual_level}\n"
+        f"Level : {playerclass.actual_level}\n"
         f"{config.MESSAGE_TEXT.get('nb_squads_abandoned', '(Missing translation)')} : "
-        f"{player.total_abandons}\n"
-        f"{player.known_team}/{player.known_unit_name}/{player.known_role}"
-        f" ➡️ "
-        f"{player.actual_team}/{player.actual_unit_name}/{player.actual_role}"
+        f"{playerclass.total_abandons}\n"
+        f"{playerclass.known_team}/{playerclass.known_unit_name}/"
+        f"{playerclass.known_role} ➡️ {playerclass.actual_team}"
+        f"/{playerclass.actual_unit_name}/{playerclass.actual_role}"
     )
     embed = discord.Embed(
-        title=player.name,
-        url=common_functions.get_external_profile_url(player.player_id, player.name),
+        title=playerclass.name,
+        url=common_functions.get_external_profile_url(
+            playerclass.player_id, playerclass.name
+        ),
         description=embed_desc,
         color=0xffffff
     )
@@ -315,23 +360,27 @@ async def send_discord_alert_async(
         url=common_functions.DISCORD_EMBED_AUTHOR_URL,
         icon_url=common_functions.DISCORD_EMBED_AUTHOR_ICON_URL
     )
-    embed.set_thumbnail(url=common_functions.get_avatar_url(player.player_id))
+    embed.set_thumbnail(
+        url=common_functions.get_avatar_url(playerclass.player_id)
+    )
 
     try:
         webhook = discord.SyncWebhook.from_url(webhook_url)
-        await asyncio.to_thread(common_functions.discord_embed_send, embed, webhook)
-    except Exception as e:
+        await asyncio.to_thread(
+            common_functions.discord_embed_send, embed, webhook
+        )
+    except Exception as error:
         logger.warning(
             "⚠️ '%s' (%s) - Couldn't send Discord alert : %s",
-            player.name,
-            player.actual_level,
-            str(e)
+            playerclass.name,
+            playerclass.actual_level,
+            str(error)
         )
 
 
 async def track_role_changes_async() -> None:
     """
-    Main function to track role changes and send alerts.
+    Main function to track role changes and send messages and alerts.
     'realtime_all' dict : realtime players data
     'known_all' dict : players data as it was at the end of last loop
 
@@ -351,33 +400,39 @@ async def track_role_changes_async() -> None:
     rcon = Rcon(SERVER_INFO)
     known_all: dict[str, dict[str, Any]] = {}
 
+    # Infinite loop
     while True:
 
         # Get realtime players data
         try:
             realtime_all = await asyncio.to_thread(rcon.get_detailed_players)
-        except Exception as e:
-            logger.error("get_detailed_players() failed: %s", str(e))
+        except Exception as error:
+            logger.error("get_detailed_players() failed: %s", str(error))
             await asyncio.sleep(watch_interval)
             continue
 
         # Evaluate support needs
-        allies_supports_needed, axis_supports_needed = is_support_needed(realtime_all)
+        (
+            allies_supports_needed,
+            axis_supports_needed
+        ) = is_support_needed(realtime_all)
 
         # Clean obsoleted entries in 'known_all'
-        priority_queue = []
-        known_all = clean_old_entries(known_all, priority_queue=priority_queue)
+        known_all = clean_old_entries(known_all, priority_queue=[])
 
         now_dt = datetime.now()
-
         tasks = []
 
         # For each player on server
         for realtime_player in realtime_all["players"].values():
 
             # Validate realtime data
-            required_keys = ['player_id', 'name', 'level', 'team', 'unit_name', 'role']
-            missing = [key for key in required_keys if key not in realtime_player]
+            required_keys = [
+                'player_id', 'name', 'level', 'team', 'unit_name', 'role'
+            ]
+            missing = [
+                key for key in required_keys if key not in realtime_player
+            ]
             if missing:
                 logger.warning(
                     "'%s' (%s) - Skipping player : missing fields : %s",
@@ -388,7 +443,10 @@ async def track_role_changes_async() -> None:
                 continue  # Some keys are missing : skip this player
 
             # Extract realtime data
-            player_id, name, actual_level, actual_team, actual_unit, actual_role = (
+            (
+                player_id, name, actual_level,
+                actual_team, actual_unit, actual_role
+            ) = (
                 realtime_player['player_id'],
                 realtime_player['name'],
                 realtime_player['level'],
@@ -417,31 +475,33 @@ async def track_role_changes_async() -> None:
                     actual_unit,
                     actual_role
                 )
-                logger.debug("known_all dict now contains %s entries", len(known_all))
+                logger.debug(
+                    "known_all dict now contains %s entries", len(known_all)
+                )
                 continue  # We'll check for changes on next loop
 
             # Get historical data from 'known_all'
-            known_playerdata = known_all[player_id]
-            known_level = known_playerdata['level']
-            known_team = known_playerdata['team']
-            known_unit_name = known_playerdata['unit_name']
-            known_role = known_playerdata['role']
-            total_abandons = known_playerdata['total_abandons']
-            lasttime_abandon = known_playerdata['lasttime_abandon']
+            known_player = known_all[player_id]
+            known_level = known_player['level']
+            known_team = known_player['team']
+            known_unit_name = known_player['unit_name']
+            known_role = known_player['role']
+            total_abandons = known_player['total_abandons']
+            lasttime_abandon = known_player['lasttime_abandon']
 
             # The player levelled up
             if known_level < actual_level:
-                logger.debug("💪 '%s' (%s ➡️ %s)", name, known_level, actual_level)
-                known_playerdata['level'] = actual_level  # Update dict
+                logger.debug(
+                    "💪 '%s' (%s ➡️ %s)", name, known_level, actual_level
+                )
+                known_player['level'] = actual_level  # Update dict
 
             # The player changed team/unit/role
-            role_changed = (
+            if (
                 known_team != actual_team
                 or known_unit_name != actual_unit
                 or known_role != actual_role
-            )
-            if role_changed:
-                # common_change_str
+            ):
                 common_change_str = (
                     f"'{name}' ({actual_level})"
                     f" - {known_team}/{known_unit_name}/{known_role}"
@@ -453,16 +513,14 @@ async def track_role_changes_async() -> None:
                     # Update abandon count and last abandon datetime
                     total_abandons += 1
                     lasttime_abandon = now_dt
-                    # Log
-                    logger.info(f"🟥x{total_abandons} {common_change_str}")
+                    logger.info("🟥x%s %s", total_abandons, common_change_str)
 
                 # The player wasn't an officer
                 else:
-                    # Log
-                    logger.debug(f"🟩 {common_change_str}")
+                    logger.debug("🟩 %s", common_change_str)
 
                 # Create a player dataclass to be used in functions
-                player = PlayerData(
+                playerclass = PlayerData(
                     player_id=player_id,  # from realtime
                     name=name,  # from realtime
                     actual_level=actual_level,  # from realtime
@@ -479,7 +537,7 @@ async def track_role_changes_async() -> None:
                 )
 
                 # Update historical data in 'known_all'
-                known_playerdata.update({
+                known_player.update({
                     'lasttime_role_change': now_dt,
                     'team': actual_team,
                     'unit_name': actual_unit,
@@ -489,8 +547,18 @@ async def track_role_changes_async() -> None:
                 })
 
                 # Send ingame message to player and Discord alert to admins
-                tasks.append(limited_task(send_message_async, rcon, player, realtime_all, watch_interval))
-                tasks.append(limited_task(send_discord_alert_async, player, watch_interval))
+                tasks.append(
+                    limited_task(
+                        send_message_async,
+                        rcon, playerclass, realtime_all, watch_interval
+                    )
+                )
+                tasks.append(
+                    limited_task(
+                        send_discord_alert_async,
+                        playerclass, watch_interval
+                    )
+                )
 
         if tasks:
             await asyncio.gather(*tasks)
@@ -512,9 +580,11 @@ signal.signal(signal.SIGINT, shutdown_handler)
 signal.signal(signal.SIGTERM, shutdown_handler)
 
 logger.info(
-    "\n-------------------------------------------------------------------------------\n"
+    "\n---------------------------------------"
+    "----------------------------------------\n"
     "%s started\n"
-    "-------------------------------------------------------------------------------",
+    "-----------------------------------------"
+    "--------------------------------------",
     config.BOT_NAME
 )
 
