@@ -72,6 +72,7 @@ Any change to these files requires a CRCON rebuild and restart (using the `resta
 ### ⚠️ CRCON upgrade
 This plugin requires a modification of the `/root/hll_rcon_tool/config/supervisord.conf` original CRCON file.  
 If any CRCON upgrade implies updating this file, the usual CRCON upgrade procedure will **FAIL**.  
+
 To successfully upgrade your CRCON, you'll have to revert the changes back, then reinstall this plugin.  
 To revert to the original file :  
 ```shell
