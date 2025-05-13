@@ -25,7 +25,7 @@ from rcon.game_logs import get_recent_logs
 from rcon.rcon import Rcon
 from rcon.settings import SERVER_INFO
 from rcon.utils import get_server_number  # Discord feature
-import custom_tools.common_functions as common_functions  # Discord feature
+import custom_tools.common_functions as common_functions
 import custom_tools.watch_roles_config as config
 
 
