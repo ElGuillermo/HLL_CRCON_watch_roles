@@ -29,6 +29,7 @@ Log into your CRCON host machine using SSH and enter these commands (one line at
   ```shell
   cd /root/hll_rcon_tool
   wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_restart/refs/heads/main/restart.sh
+
   mkdir custom_tools
   cd custom_tools
   wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_custom_common_functions.py/refs/heads/main/common_functions.py
