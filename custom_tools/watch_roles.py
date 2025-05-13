@@ -114,11 +114,11 @@ def is_support_needed(
 
 
 def was_alone_in_squad(
-    playerclass: PlayerData, 
+    playerclass: PlayerData,
     realtime_all: dict
 ) -> bool:
     """
-    Is the player alone in its squad ?
+    Was the player alone in its previous squad ?
     (If so : he won't get the "quitting officer" warning if he leaves it)
     """
     # He was unassigned
@@ -163,15 +163,6 @@ def is_this_role_taken_in_squad(
 ) -> bool:
     """
     Is there a player with the target_role in player's squad (team + unit) ?
-    Early return if the current player :
-        - isn't assigned to a unit (unit_name is None)
-        - is commander
-        - already plays target_role.
-    Doesn't test :
-        - Players with incomplete data
-        - Current player
-        - Unassigned players
-        - Commanders
     """
     # Player is either unassigned or commander
     if (
@@ -248,11 +239,11 @@ def reset_on_match_end(
 ) -> dict:
     """
     Unassign all known players at match's end,
-    so they won't get warned about quitting officer role,
-    neither get support suggestion or role guidance
+    so they won't get warned about quitting officer role on next match start
     """
-    now_ts = now_dt.timestamp()  # current time in seconds since epoch
+    now_ts = round(now_dt.timestamp())  # seconds since 1970-01-01T00:00:00Z
     min_timestamp = now_ts - watch_interval
+    # Search if "MATCH ENDED" log occured since the last loop time
     try:
         recent_logs = get_recent_logs(
             action_filter=["MATCH ENDED"],
@@ -265,13 +256,18 @@ def reset_on_match_end(
 
     match_end_detected = False
     for log in recent_logs["logs"]:
-        if (log["action"] == "MATCH ENDED"):
+        if log["action"] == "MATCH ENDED":  # Should be always True for any log found
             match_end_detected = True
+            match_end_timestamp = log["timestamp_ms"]
+            # There is 100 secs between "MATCH ENDED" and "MATCH START"
+            wake_up_time = round(match_end_timestamp / 1000) + 110
+            sleep_duration = wake_up_time - now_ts
             break
 
     if match_end_detected:
         entries_reset = 0
         for known_player in known_all.values():
+            # if updated, clean_old_entries() would never be triggered
             # known_player['lasttime_role_change'] = now_dt
             known_player['unit_name'] = None
             known_player['role'] = "rifleman"
@@ -279,10 +275,11 @@ def reset_on_match_end(
             known_player['lasttime_abandon'] = None
             entries_reset += 1
         logger.debug(
-            "Match ended : %s 'known_all' dict entries have been reset. Waiting 2 minutes...",
-            entries_reset
+            "Match ended : %s 'known_all' entries have been reset. Waiting %s s...",
+            entries_reset,
+            sleep_duration
         )
-        sleep(120)  # There is 100 secs between "MATCH ENDED" and "MATCH START"
+        sleep(sleep_duration)
 
     return known_all
 
@@ -383,7 +380,7 @@ async def send_message_async(
             )
         )
         and not is_this_role_taken_in_squad(playerclass, realtime_all, "support")
-        and playerclass.actual_role in config.SUPPORT_CANDIDATES
+        and playerclass.actual_role in common_functions.SUPPORT_CANDIDATES
         and (
             config.ALWAYS_SUGGEST_SUPPORT
             or playerclass.actual_level < config.MIN_IMMUNE_LEVEL
@@ -526,10 +523,10 @@ async def track_role_changes_async() -> None:
 
         now_dt = datetime.now(timezone.utc)
 
-        # Clean obsoleted entries in 'known_all'
+        # Clean 'known_all' obsoleted entries
         known_all = clean_old_entries(now_dt, known_all, priority_queue=[])
 
-        # Reset values entries in 'known_all' on match end
+        # Reset 'known_all' entries on match end
         known_all = reset_on_match_end(now_dt, known_all, watch_interval)
 
         # Get realtime players data
@@ -540,7 +537,7 @@ async def track_role_changes_async() -> None:
             await asyncio.sleep(watch_interval)
             continue
 
-        # Clean departed players in 'known_all'
+        # Clean 'known_all' departed players
         known_all = clean_departed_players(realtime_all, known_all)
 
         # Evaluate support needs
@@ -637,8 +634,7 @@ async def track_role_changes_async() -> None:
                 )
 
                 # The player was an officer
-                if known_role in config.OFFICERS:
-                    # Update abandon count and last abandon datetime
+                if known_role in common_functions.OFFICERS:
                     abandons_thismatch += 1
                     lasttime_abandon = now_dt
                     logger.info("🟥x%s %s", abandons_thismatch, common_change_str)
@@ -649,22 +645,22 @@ async def track_role_changes_async() -> None:
 
                 # Create a player dataclass to be used in functions
                 playerclass = PlayerData(
-                    player_id=player_id,  # from realtime
-                    name=name,  # from realtime
-                    actual_level=actual_level,  # from realtime
+                    player_id=player_id,
+                    name=name,
+                    actual_level=actual_level,
                     known_team=known_team,
                     known_unit_name=known_unit_name,
                     known_role=known_role,
-                    actual_team=actual_team,  # from realtime
-                    actual_unit_name=actual_unit,  # from realtime
-                    actual_role=actual_role,  # from realtime
+                    actual_team=actual_team,
+                    actual_unit_name=actual_unit,
+                    actual_role=actual_role,
                     abandons_thismatch=abandons_thismatch,
                     lasttime_abandon=lasttime_abandon,
                     allies_supports_needed=allies_supports_needed,
                     axis_supports_needed=axis_supports_needed
                 )
 
-                # Update historical data in 'known_all'
+                # Update 'known_all'
                 known_player.update({
                     'lasttime_role_change': now_dt,
                     'team': actual_team,
@@ -674,13 +670,14 @@ async def track_role_changes_async() -> None:
                     'lasttime_abandon': lasttime_abandon
                 })
 
-                # Send ingame message to player and Discord alert to admins
+                # Queue ingame messages
                 tasks.append(
                     limited_task(
                         send_message_async,
                         rcon, playerclass, realtime_all, watch_interval
                     )
                 )
+                # Queue Discord alerts
                 tasks.append(
                     limited_task(
                         send_discord_alert_async,
@@ -688,6 +685,7 @@ async def track_role_changes_async() -> None:
                     )
                 )
 
+        # Send messages and alerts
         if tasks:
             await asyncio.gather(*tasks)
 
