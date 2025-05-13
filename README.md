@@ -63,12 +63,14 @@ Log into your CRCON host machine using SSH and enter these commands (one line at
   ```
 
 ## Limitations
-⚠️ Any change to these files requires a CRCON rebuild and restart (using the `restart.sh` script) to be taken in account :
+### ⚠️ Plugin config
+Any change to these files requires a CRCON rebuild and restart (using the `restart.sh` script) to be taken in account :
 - `/root/hll_rcon_tool/custom_tools/common_functions.py`
 - `/root/hll_rcon_tool/custom_tools/watch_roles.py`
 - `/root/hll_rcon_tool/custom_tools/watch_roles_config.py`
 
-⚠️ This plugin requires a modification of the `/root/hll_rcon_tool/config/supervisord.conf` original CRCON file.  
+### ⚠️ CRCON upgrade
+This plugin requires a modification of the `/root/hll_rcon_tool/config/supervisord.conf` original CRCON file.  
 If any CRCON upgrade implies updating this file, the usual CRCON upgrade procedure will **FAIL**.  
 To successfully upgrade your CRCON, you'll have to revert the changes back, then reinstall this plugin.  
 To revert to the original file :  
