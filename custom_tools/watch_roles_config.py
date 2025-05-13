@@ -19,7 +19,7 @@ WATCH_INTERVAL = 30
 
 # Players who have reached level X won't receive role guidance
 # Disable : 0 (level-based messages won't be sent)
-# Default : 50 (players level 1-49 will get messages)
+# Default : 50 (only players level 1-49 will get the messages)
 MIN_IMMUNE_LEVEL = 50
 
 # Always warn quitting/shifting officers (whatever their level)
@@ -42,7 +42,7 @@ ALWAYS_SUGGEST_SUPPORT = True
 # ["https://discord.com/api/webhooks/...", True] = enabled
 # ["https://discord.com/api/webhooks/...", False] = disabled
 SERVER_CONFIG = [
-    ["https://discord.com/api/webhooks/1367486870203793438/5whZdEnMCZb4jkyIZ_0HfjEMK8w7ohRatxfOeYxECD22GbLu_PYIUgwLE7qubBfx8ZFC", True],  # Server 1
+    ["https://discord.com/api/webhooks/...", False],  # Server 1
     ["https://discord.com/api/webhooks/...", False],  # Server 2
     ["https://discord.com/api/webhooks/...", False],  # Server 3
     ["https://discord.com/api/webhooks/...", False],  # Server 4
@@ -153,8 +153,8 @@ MESSAGE_TEXT_DE = {
 
 # Set the language for the advice messages texts
 # (Uncomment the desired language)
-MESSAGE_TEXT = MESSAGE_TEXT_FR
-# MESSAGE_TEXT = MESSAGE_TEXT_EN
+# MESSAGE_TEXT = MESSAGE_TEXT_FR
+MESSAGE_TEXT = MESSAGE_TEXT_EN
 # MESSAGE_TEXT = MESSAGE_TEXT_ES
 # MESSAGE_TEXT = MESSAGE_TEXT_DE
 
