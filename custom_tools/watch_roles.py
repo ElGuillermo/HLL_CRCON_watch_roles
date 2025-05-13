@@ -2,10 +2,9 @@
 watch_roles.py
 
 A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that :
-- inform players about the role they took
-- warns quitting officers
+- warns quitting officers (and optionally sends Discord alerts)
 - suggests support roles when needed
-- (optionally) sends Discord alerts
+- inform players about the role they took
 
 Author: https://github.com/ElGuillermo
 License: MIT-like (free use/modify/distribute with attribution)
@@ -172,6 +171,35 @@ def is_role_in_squad(
     return False
 
 
+def clean_departed_players(
+    realtime_all: dict,
+    known_all: dict
+) -> dict:
+    """
+    Remove entries from departed players.
+    """
+    valid_player_ids = {
+        realtime_player['player_id']
+        for realtime_player in realtime_all.get("players", {}).values()
+        if isinstance(realtime_player, dict) and 'player_id' in realtime_player
+    }
+
+    for player_id in list(known_all.keys()):
+        if player_id not in valid_player_ids:
+            known_player = known_all.pop(player_id)
+            logger.debug(
+                "🛫 '%s' (%s) - not watched anymore (departed)",
+                known_player.get('name', '(unknown)'),
+                known_player.get('level', '(unknown)')
+            )
+            logger.debug(
+                "known_all dict now contains %s entries",
+                len(known_all)
+            )
+
+    return known_all
+
+
 def clean_old_entries(
     known_all: dict,
     delay: int = config.AUTO_CLEANING_TIME,
@@ -198,7 +226,7 @@ def clean_old_entries(
         if player_id in known_all:
             known_player = known_all.pop(player_id)
             logger.debug(
-                "💤 '%s' (%s) - not watched anymore",
+                "💤 '%s' (%s) - not watched anymore (obsoleted)",
                 known_player.get('name', '(unknown)'),
                 known_player.get('level', '(unknown)')
             )
@@ -416,6 +444,9 @@ async def track_role_changes_async() -> None:
             allies_supports_needed,
             axis_supports_needed
         ) = is_support_needed(realtime_all)
+
+        # Clean departed players in 'known_all'
+        known_all = clean_departed_players(realtime_all, known_all)
 
         # Clean obsoleted entries in 'known_all'
         known_all = clean_old_entries(known_all, priority_queue=[])
