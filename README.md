@@ -24,6 +24,7 @@ A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform pl
   - a `restart.sh` file
   - a `custom_tools/` folder
   - a `custom_tools/common_functions.py` file
+
   If so, please redownload them, as they may have been updated
   ```shell
   cd /root/hll_rcon_tool
