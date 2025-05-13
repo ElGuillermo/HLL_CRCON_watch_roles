@@ -17,9 +17,9 @@ A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform pl
 >   
 > If so, you'll have to adapt the commands below accordingly.
 
-- Log into your CRCON host machine using SSH and enter these commands (one line at at time) :  
+Log into your CRCON host machine using SSH and enter these commands (one line at at time) :  
 
-  First part  
+### First part  
   If you already have installed any other "custom tools" from me, you can may already have :
   - a `restart.sh` file
   - a `custom_tools/` folder
@@ -33,12 +33,16 @@ A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform pl
   cd custom_tools
   wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_custom_common_functions.py/refs/heads/main/common_functions.py
   ```
-  Second part
+
+### Second part
   ```shell
   cd /root/hll_rcon_tool/custom_tools
   wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_watch_roles/refs/heads/main/custom_tools/watch_roles.py
   wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_watch_roles/refs/heads/main/custom_tools/watch_roles_config.py
-- Edit `/root/hll_rcon_tool/config/supervisord.conf` to add this bot section : 
+  ```
+
+### Third part
+  Edit `/root/hll_rcon_tool/config/supervisord.conf` to add this bot section : 
   ```conf
   [program:watch_roles]
   command=python -m custom_tools.watch_roles
