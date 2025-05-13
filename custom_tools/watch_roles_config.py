@@ -13,12 +13,14 @@ License: MIT-like (free use/modify/distribute with attribution)
 
 # The bot will check the players every X seconds
 # Any value lower than 30 will be ignored and defaulted to 30
+# Any value higher than 60 will be ignored and defaulted to 60
 # Default : 30
 WATCH_INTERVAL = 30
 
 # Players who have reached level X won't receive role guidance
-# Default : 30
-MIN_IMMUNE_LEVEL = 30
+# Disable : 0 (level-based messages won't be sent)
+# Default : 50 (players level 1-49 will get messages)
+MIN_IMMUNE_LEVEL = 50
 
 # Always warn quitting/shifting officers (whatever their level)
 # (they'll always be warned if their level is below MIN_IMMUNE_LEVEL)
@@ -171,3 +173,7 @@ BOT_NAME = "CRCON_watch_roles"
 # Unfollow players who didn't change role since X minutes
 # Default : 90
 AUTO_CLEANING_TIME = 90
+
+# Limit threading concurrency
+# Default : 10
+SEMAPHORE_LIMIT = 10
