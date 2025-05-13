@@ -20,8 +20,11 @@ A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform pl
 - Log into your CRCON host machine using SSH and enter these commands (one line at at time) :  
 
   First part  
-  If you already have installed any other "custom tools" from ElGuillermo, you can skip this part.  
-  (though it's always a good idea to redownload the files, as they could have been updated)
+  If you already have installed any other "custom tools" from me, you can may already have :
+  - a `restart.sh` file
+  - a `custom_tools/` folder
+  - a `custom_tools/common_functions.py` file
+  If so, please redownload them, as they may have been updated
   ```shell
   cd /root/hll_rcon_tool
   wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_restart/refs/heads/main/restart.sh
