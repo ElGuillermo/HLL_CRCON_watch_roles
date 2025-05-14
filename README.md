@@ -55,12 +55,13 @@ Log into your CRCON host machine using SSH and enter these commands (one line at
   ```
 
 ## Config
-- Edit `/root/hll_rcon_tool/custom_tools/watch_roles_config.py` and set the parameters to fit your needs.
-- Restart CRCON :
-  ```shell
-  cd /root/hll_rcon_tool
-  sh ./restart.sh
-  ```
+Edit `/root/hll_rcon_tool/custom_tools/watch_roles_config.py` and set the parameters to fit your needs.
+
+Restart CRCON :
+```shell
+cd /root/hll_rcon_tool
+sh ./restart.sh
+```
 
 ## Limitations
 ### ⚠️ Plugin config
