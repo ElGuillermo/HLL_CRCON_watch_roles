@@ -179,7 +179,7 @@ def is_this_role_taken_in_squad(
     """
     # Player is either unassigned or commander
     if (
-        not playerclass.actual_unit_name
+        playerclass.actual_unit_name == "unassigned"
         or playerclass.actual_unit_name == "command"
     ):
         return False
