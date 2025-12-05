@@ -67,7 +67,8 @@ MESSAGE_TEXT_FR = {
     "armycommander": "Tu as choisi de jouer\n- Commandant -\n\nTu DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nDemande aux officiers de poser des garnies\net aux ingénieurs de construire des nodes dès qu'ils le peuvent.",
     "officer": "Tu as choisi de jouer\n- Squad Leader (SL) -\n\nTu DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nPose des garnies à 200m des points et ton AP à 100m.\nInforme le commandant de tes actions et exécute ses ordres.",
     "tankcommander": "Tu as choisi de jouer\n- Chef de char -\n\nTu DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nUne équipe de tankistes est toujours plus efficace quand elle communique.\nInforme ton commandant de ce que tu vois.",
-    "spotter": "Tu as choisi de jouer\n- SL reco -\n\nTu DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nFaufile-toi dans les lignes ennemies,\nélimine les cibles prioritaires\ndétruis les nodes\net informe le commandant de ce que tu vois",
+    "spotter": "Tu as choisi de jouer\n- SL reco -\n\nTu DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nFaufile-toi dans les lignes ennemies,\nélimine les cibles prioritaires\ndétruis les nodes\net informe le commandant de ce que tu vois.",
+    "artilleryobserver": "Tu as choisi de jouer\n- Observateur artillerie -\n\n TU DOIS communiquer en vocal.\nSi tu ne peux/veux pas :\ncède ta place !\n----------\nIndique à tes coéquipiers les cibles sur lesquelles tirer.",
     # Soldiers
     "antitank": "Tu as choisi de jouer\n- Antitank -\nRappelle-toi que le point faible des blindés est à l'arrière.",
     "automaticrifleman": "Tu as choisi de jouer\nfusilier auto -\nSécurise l'avancée de tes camarades\nProtège le SL, le soutien, les garnies et les APs.",
@@ -78,7 +79,9 @@ MESSAGE_TEXT_FR = {
     "engineer": "Tu as choisi de jouer\n- Ingénieur -\nTa mission première est de t'assurer que le commandant dispose de nodes.\nTu peux aussi fortifier les points et réparer les chars.",
     "medic": "Tu as choisi de jouer\n- Médecin -\nReste en arrière et soigne les blessés.\nAnnonce-toi en vocal de proximité pour éviter qu'ils se redéploient avant ton arrivée.",
     "crewman": "Tu as choisi de jouer\n- Tankiste -\nUne équipe de tankistes est toujours plus efficace quand elle communique.\nInforme ton chef de char de ce que tu vois.",
-    "sniper": "Tu as choisi de jouer\n- Sniper -\nFaufile-toi dans les lignes ennemies,\nélimine les cibles prioritaires\ndétruis les nodes\net informe ton SL de ce que tu vois."
+    "sniper": "Tu as choisi de jouer\n- Sniper -\nFaufile-toi dans les lignes ennemies,\nélimine les cibles prioritaires\ndétruis les nodes\net informe ton SL de ce que tu vois.",
+    "artilleryengineer": "Tu as choisi de jouer\n- Ingénieur artillerie -\nTu dois assister ton officier, protéger et réparer le véhicule et le canon statique.",
+    "artillerysupport": "Tu as choisi de jouer\n- Soutien artillerie -\nTu dois fournir les ressources nécessaires à la construction du canon statique et à ses protections."
 }
 
 # English
@@ -91,6 +94,7 @@ MESSAGE_TEXT_EN = {
     "officer": "You chose to play\n- Squad Leader (SL) -\n\nYou MUST communicate via voice chat.\nIf you can't or won't: give up your spot!\n----------\nPlace garrisons 200m from objectives and your OP 100m away.\nInform the commander of your actions and follow orders.",
     "tankcommander": "You chose to play\n- Tank Commander -\n\nYou MUST communicate via voice chat.\nIf you can't or won't: give up your spot!\n----------\nA tank crew is always more effective when communicating.\nInform your commander of what you see.",
     "spotter": "You chose to play\n- Recon SL -\n\nYou MUST communicate via voice chat.\nIf you can't or won't: give up your spot!\n----------\nSneak into enemy lines,\neliminate priority targets,\ndestroy nodes,\nand report to the commander what you see.",
+    "artilleryobserver": "You chose to play\n- Artillery observer -\n\nYou MUST communicate via voice chat.\nIf you can't or won't: give up your spot!\n----------\nIndicate to your teammates which targets to shoot at.",
     # Soldiers
     "antitank": "You chose to play\n- Anti-tank -\nRemember, the weak spot of armored vehicles is at the rear.",
     "automaticrifleman": "You chose to play\n- Automatic Rifleman -\nSecure your comrades' advance.\nProtect the SL, the support, garrisons, and OPs.",
@@ -101,7 +105,9 @@ MESSAGE_TEXT_EN = {
     "engineer": "You chose to play\n- Engineer -\nYour main mission is to ensure the commander has nodes.\nYou can also fortify points and repair tanks.",
     "medic": "You chose to play\n- Medic -\nStay in the rear and heal the wounded.\nAnnounce yourself using proximity voice chat so they don’t redeploy before you arrive.",
     "crewman": "You chose to play\n- Tank Crew -\nA tank crew is always more effective when communicating.\nInform your tank commander of what you see.",
-    "sniper": "You chose to play\n- Sniper -\nSneak into enemy lines,\neliminate priority targets,\ndestroy nodes,\nand report what you see to your SL."
+    "sniper": "You chose to play\n- Sniper -\nSneak into enemy lines,\neliminate priority targets,\ndestroy nodes,\nand report what you see to your SL.",
+    "artilleryengineer": "You chose to play\n- Artillery engineer -\nYou must assist your officer, protect and repair the vehicle and the static gun.",
+    "artillerysupport": "You chose to play\n- Artillery support -\nYou must provide the resources necessary for the construction of the static cannon and its protections."
 }
 
 # Spanish
@@ -114,6 +120,7 @@ MESSAGE_TEXT_ES = {
     "officer": "Has elegido jugar como\n- Líder de escuadra (SL) -\n\nDEBES comunicarte por chat de voz.\nSi no puedes o no quieres: ¡cede tu puesto!\n----------\nColoca guarniciones a 200m de los objetivos y tu OP a 100m.\nInforma al comandante de tus acciones y sigue órdenes.",
     "tankcommander": "Has elegido jugar como\n- Comandante de tanque -\n\nDEBES comunicarte por chat de voz.\nSi no puedes o no quieres: ¡cede tu puesto!\n----------\nUna tripulación es siempre más efectiva cuando se comunica.\nInforma a tu comandante de lo que veas.",
     "spotter": "Has elegido jugar como\n- Líder de reconocimiento -\n\nDEBES comunicarte por chat de voz.\nSi no puedes o no quieres: ¡cede tu puesto!\n----------\nInfiltrate en las líneas enemigas,\nelimina objetivos prioritarios,\ndestruye nodos,\ne informa al comandante de lo que veas.",
+    "artilleryobserver": "Has elegido jugar como\n- Observador de artillería -\n\nDEBES comunicarte por chat de voz.\nSi no puedes o no quieres: ¡cede tu puesto!\n----------\nIndica a tus compañeros de equipo a qué objetivos disparar.",
     # Soldiers
     "antitank": "Has elegido jugar como\n- Antitanque -\nRecuerda, el punto débil de los vehículos blindados está en la parte trasera.",
     "automaticrifleman": "Has elegido jugar como\n- Fusilero automático -\nAsegura el avance de tus compañeros.\nProtege al SL, al apoyo, las guarniciones y los OPs.",
@@ -124,7 +131,9 @@ MESSAGE_TEXT_ES = {
     "engineer": "Has elegido jugar como\n- Ingeniero -\nTu misión principal es asegurar que el comandante tenga nodos.\nTambién puedes fortificar puntos y reparar tanques.",
     "medic": "Has elegido jugar como\n- Médico -\nMantente en la retaguardia y cura a los heridos.\nAnúnciate usando el chat de voz de proximidad para que no reaparezcan antes de que llegues.",
     "crewman": "Has elegido jugar como\n- Tripulación de tanque -\nUna tripulación es siempre más efectiva cuando se comunica.\nInforma a tu comandante de tanque sobre lo que veas.",
-    "sniper": "Has elegido jugar como\n- Francotirador -\nInfiltrate en las líneas enemigas,\nelimina objetivos prioritarios,\ndestruye nodos,\ne informa a tu SL de lo que veas."
+    "sniper": "Has elegido jugar como\n- Francotirador -\nInfiltrate en las líneas enemigas,\nelimina objetivos prioritarios,\ndestruye nodos,\ne informa a tu SL de lo que veas.",
+    "artilleryengineer": "Has elegido jugar como\n- Ingeniero de artillería -\nDebes ayudar a tu oficial, proteger y reparar el vehículo y el arma estática.",
+    "artillerysupport": "Has elegido jugar como\n- Apoyo de artillería -\nDebes proporcionar los recursos necesarios para la construcción del cañón estático y sus protecciones."
 }
 
 # German
@@ -137,6 +146,7 @@ MESSAGE_TEXT_DE = {
     "officer": "Du hast gewählt zu spielen als\n- Truppführer (SL) -\n\nDU MUSST über Voice-Chat kommunizieren.\nWenn du nicht kannst oder willst: Gib deinen Platz frei!\n----------\nPlatziere Garnisonen 200 m vom Ziel entfernt und dein OP 100 m entfernt.\nInformiere den Kommandanten über deine Aktionen und folge seinen Befehlen.",
     "tankcommander": "Du hast gewählt zu spielen als\n- Panzerkommandant -\n\nDU MUSST über Voice-Chat kommunizieren.\nWenn du nicht kannst oder willst: Gib deinen Platz frei!\n----------\nEine Panzerbesatzung ist immer effektiver, wenn sie kommuniziert.\nInformiere deinen Kommandanten über alles, was du siehst.",
     "spotter": "Du hast gewählt zu spielen als\n- Aufklärungsführer -\n\nDU MUSST über Voice-Chat kommunizieren.\nWenn du nicht kannst oder willst: Gib deinen Platz frei!\n----------\nSchleiche dich in feindliche Linien,\nbeseitige vorrangige Ziele,\nzerstöre Knotenpunkte,\nund melde dem Kommandanten, was du siehst.",
+    "artilleryobserver": "Du hast gewählt zu spielen als\n- Artilleriebeobachter -\n\nDU MUSST über Voice-Chat kommunizieren.\nWenn du nicht kannst oder willst: Gib deinen Platz frei!\n----------\nWeisen Sie Ihre Teamkollegen darauf hin, auf welche Ziele sie schießen sollen.",
     # Soldiers
     "antitank": "Du hast gewählt zu spielen als\n- Panzerabwehr -\nDenke daran: Die Schwachstelle gepanzerter Fahrzeuge ist das Heck.",
     "automaticrifleman": "Du hast gewählt zu spielen als\n- MG-Schütze -\nSichere den Vormarsch deiner Kameraden.\nSchütze den SL, die Unterstützer, Garnisonen und OPs.",
@@ -147,7 +157,9 @@ MESSAGE_TEXT_DE = {
     "engineer": "Du hast gewählt zu spielen als\n- Ingenieur -\nDeine Hauptaufgabe ist es, dem Kommandanten Versorgungsknoten bereitzustellen.\nDu kannst auch Punkte befestigen und Panzer reparieren.",
     "medic": "Du hast gewählt zu spielen als\n- Sanitäter -\nBleib im Hinterland und heile Verwundete.\nMelde dich über den Nähe-Voice-Chat, damit sie nicht neu spawnen, bevor du ankommst.",
     "crewman": "Du hast gewählt zu spielen als\n- Panzerbesatzung -\nEine Panzerbesatzung ist immer effektiver, wenn sie kommuniziert.\nInformiere deinen Panzerkommandanten über alles, was du siehst.",
-    "sniper": "Du hast gewählt zu spielen als\n- Scharfschütze -\nSchleiche dich in feindliche Linien,\nbeseitige vorrangige Ziele,\nzerstöre Knotenpunkte,\nund melde deinem SL, was du siehst."
+    "sniper": "Du hast gewählt zu spielen als\n- Scharfschütze -\nSchleiche dich in feindliche Linien,\nbeseitige vorrangige Ziele,\nzerstöre Knotenpunkte,\nund melde deinem SL, was du siehst.",
+    "artilleryengineer": "Du hast gewählt zu spielen als\n- Artillerieingenieur -\nSie müssen Ihrem Beamten helfen, das Fahrzeug und die stationäre Waffe schützen und reparieren.",
+    "artillerysupport": "Du hast gewählt zu spielen als\n- Artillerieunterstützung -\nSie müssen die für den Bau der stationären Kanone und ihrer Schutzvorrichtungen notwendigen Ressourcen bereitstellen."
 }
 
 
