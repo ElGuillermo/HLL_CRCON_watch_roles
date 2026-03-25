@@ -80,8 +80,8 @@ MESSAGE_TEXT_FR = {
     "medic": "Tu as choisi de jouer\n- Médecin -\nReste en arrière et soigne les blessés.\nAnnonce-toi en vocal de proximité pour éviter qu'ils se redéploient avant ton arrivée.",
     "crewman": "Tu as choisi de jouer\n- Tankiste -\nUne équipe de tankistes est toujours plus efficace quand elle communique.\nInforme ton chef de char de ce que tu vois.",
     "sniper": "Tu as choisi de jouer\n- Sniper -\nFaufile-toi dans les lignes ennemies,\nélimine les cibles prioritaires\ndétruis les nodes\net informe ton SL de ce que tu vois.",
-    "artilleryengineer": "Tu as choisi de jouer\n- Ingénieur artillerie -\nTu dois assister ton officier, protéger et réparer le véhicule et le canon statique.",
-    "artillerysupport": "Tu as choisi de jouer\n- Soutien artillerie -\nTu dois fournir les ressources nécessaires à la construction du canon statique et à ses protections."
+    "gunner": "Tu as choisi de jouer\n- Tireur d'artillerie -\nTu dois assister ton officier, protéger et réparer le véhicule et le canon statique.",
+    "operator": "Tu as choisi de jouer\n- Opérateur artillerie -\nTu dois fournir les ressources nécessaires à la construction du canon statique et à ses protections."
 }
 
 # English
@@ -106,8 +106,8 @@ MESSAGE_TEXT_EN = {
     "medic": "You chose to play\n- Medic -\nStay in the rear and heal the wounded.\nAnnounce yourself using proximity voice chat so they don’t redeploy before you arrive.",
     "crewman": "You chose to play\n- Tank Crew -\nA tank crew is always more effective when communicating.\nInform your tank commander of what you see.",
     "sniper": "You chose to play\n- Sniper -\nSneak into enemy lines,\neliminate priority targets,\ndestroy nodes,\nand report what you see to your SL.",
-    "artilleryengineer": "You chose to play\n- Artillery engineer -\nYou must assist your officer, protect and repair the vehicle and the static gun.",
-    "artillerysupport": "You chose to play\n- Artillery support -\nYou must provide the resources necessary for the construction of the static cannon and its protections."
+    "gunner": "You chose to play\n- Artillery gunner -\nYou must assist your officer, protect and repair the vehicle and the static gun.",
+    "operator": "You chose to play\n- Artillery operator -\nYou must provide the resources necessary for the construction of the static cannon and its protections."
 }
 
 # Spanish
@@ -132,8 +132,8 @@ MESSAGE_TEXT_ES = {
     "medic": "Has elegido jugar como\n- Médico -\nMantente en la retaguardia y cura a los heridos.\nAnúnciate usando el chat de voz de proximidad para que no reaparezcan antes de que llegues.",
     "crewman": "Has elegido jugar como\n- Tripulación de tanque -\nUna tripulación es siempre más efectiva cuando se comunica.\nInforma a tu comandante de tanque sobre lo que veas.",
     "sniper": "Has elegido jugar como\n- Francotirador -\nInfiltrate en las líneas enemigas,\nelimina objetivos prioritarios,\ndestruye nodos,\ne informa a tu SL de lo que veas.",
-    "artilleryengineer": "Has elegido jugar como\n- Ingeniero de artillería -\nDebes ayudar a tu oficial, proteger y reparar el vehículo y el arma estática.",
-    "artillerysupport": "Has elegido jugar como\n- Apoyo de artillería -\nDebes proporcionar los recursos necesarios para la construcción del cañón estático y sus protecciones."
+    "gunner": "Has elegido jugar como\n- Artillero -\nDebes ayudar a tu oficial, proteger y reparar el vehículo y el arma estática.",
+    "operator": "Has elegido jugar como\n- Operador de artillería -\nDebes proporcionar los recursos necesarios para la construcción del cañón estático y sus protecciones."
 }
 
 # German
@@ -158,8 +158,8 @@ MESSAGE_TEXT_DE = {
     "medic": "Du hast gewählt zu spielen als\n- Sanitäter -\nBleib im Hinterland und heile Verwundete.\nMelde dich über den Nähe-Voice-Chat, damit sie nicht neu spawnen, bevor du ankommst.",
     "crewman": "Du hast gewählt zu spielen als\n- Panzerbesatzung -\nEine Panzerbesatzung ist immer effektiver, wenn sie kommuniziert.\nInformiere deinen Panzerkommandanten über alles, was du siehst.",
     "sniper": "Du hast gewählt zu spielen als\n- Scharfschütze -\nSchleiche dich in feindliche Linien,\nbeseitige vorrangige Ziele,\nzerstöre Knotenpunkte,\nund melde deinem SL, was du siehst.",
-    "artilleryengineer": "Du hast gewählt zu spielen als\n- Artillerieingenieur -\nSie müssen Ihrem Beamten helfen, das Fahrzeug und die stationäre Waffe schützen und reparieren.",
-    "artillerysupport": "Du hast gewählt zu spielen als\n- Artillerieunterstützung -\nSie müssen die für den Bau der stationären Kanone und ihrer Schutzvorrichtungen notwendigen Ressourcen bereitstellen."
+    "gunner": "Du hast gewählt zu spielen als\n- Artilleriebediener -\nSie müssen Ihrem Beamten helfen, das Fahrzeug und die stationäre Waffe schützen und reparieren.",
+    "operator": "Du hast gewählt zu spielen als\n- Artillerieschütze -\nSie müssen die für den Bau der stationären Kanone und ihrer Schutzvorrichtungen notwendigen Ressourcen bereitstellen."
 }
 
 
