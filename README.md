@@ -47,7 +47,7 @@ Log into your CRCON host machine using SSH and enter these commands (one line at
   ```conf
   [program:watch_roles]
   command=python -m custom_tools.watch_roles
-  environment=LOGGING_FILENAME=watch_roles_%(ENV_SERVER_NUMBER)s.log
+  environment=LOGGING_FILENAME=custom_tools_watch_roles_%(ENV_SERVER_NUMBER)s.log
   startretries=100
   startsecs=10
   autostart=true
