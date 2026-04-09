@@ -175,7 +175,7 @@ MESSAGE_TEXT = MESSAGE_TEXT_EN
 # -------------------------------------------------------------------------------------------------
 
 # Bot name that will be displayed in logs and Discord messages
-BOT_NAME = "CRCON_watch_roles"
+BOT_NAME = "custom_tools_watch_roles"
 
 # Autocleaning
 # Unfollow players who didn't change role since X minutes
