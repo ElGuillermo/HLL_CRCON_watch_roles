@@ -20,7 +20,7 @@ A plugin for HLL CRCON (https://github.com/MarechJ/hll_rcon_tool) that inform pl
 Log into your CRCON host machine using SSH and enter these commands (one line at at time) :  
 
 ### First part  
-  If you already have installed any other "custom tools" from me, you can may already have :
+  If you already have installed any other "custom tools" from me, you may already have :
   - a `restart.sh` file
   - a `custom_tools/` folder
   - a `custom_tools/common_functions.py` file
@@ -28,18 +28,18 @@ Log into your CRCON host machine using SSH and enter these commands (one line at
   If so, please redownload them, as they may have been updated
   ```shell
   cd /root/hll_rcon_tool
-  wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_restart/refs/heads/main/restart.sh
+  wget -O https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_restart/refs/heads/main/restart.sh
 
-  mkdir /root/hll_rcon_tool/custom_tools
+  mkdir -p /root/hll_rcon_tool/custom_tools
   cd /root/hll_rcon_tool/custom_tools
-  wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_custom_common_functions.py/refs/heads/main/common_functions.py
+  wget -O https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_custom_common_functions.py/refs/heads/main/common_functions.py
   ```
 
 ### Second part
   ```shell
   cd /root/hll_rcon_tool/custom_tools
-  wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_watch_roles/refs/heads/main/custom_tools/watch_roles.py
-  wget https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_watch_roles/refs/heads/main/custom_tools/watch_roles_config.py
+  wget -O https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_watch_roles/refs/heads/main/custom_tools/watch_roles.py
+  wget -O https://raw.githubusercontent.com/ElGuillermo/HLL_CRCON_watch_roles/refs/heads/main/custom_tools/watch_roles_config.py
   ```
 
 ### Third part
