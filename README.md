@@ -17,7 +17,7 @@ Unofficial plugin for the Hell Let Loose (HLL) [CRCON](https://github.com/Marech
 - You can send reports about quitting officers in a Discord channel
 - Available in 🇫🇷 French, 🇬🇧 English, 🇪🇸 Spanish and 🇩🇪 German
 
---
+---
 
 > [!IMPORTANT]
 > - The shell commands given below assume your CRCON is installed in `/root/hll_rcon_tool`  
