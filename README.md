@@ -2,7 +2,7 @@
 
 Unofficial plugin for the Hell Let Loose (HLL) [CRCON](https://github.com/MarechJ/hll_rcon_tool)
 
-#### Informs players about the role they took.
+### Informs players about the role they took.
 
 ![image](https://github.com/user-attachments/assets/c7f659c9-a4c8-4b3a-b3b6-a474e18563cb) ![image](https://github.com/user-attachments/assets/6324c5da-4192-4ba4-94d4-0e1649a06f77) ![image](https://github.com/user-attachments/assets/ac838b94-7821-4a7e-aa09-296c6054bf5a) ![image](https://github.com/user-attachments/assets/ca79aaf9-c4b6-449d-ba56-e4c62352a4fa) ![image](https://github.com/user-attachments/assets/b14ca4a7-5f5e-4993-84ce-54b2e822cb1a)
 
